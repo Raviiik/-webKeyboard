@@ -86,22 +86,22 @@
       touch-action: manipulation;
       color: #111;
     }
-    .key:active { transform: translateY(1px) scale(.99); }
-    .key:hover { background: #eef5ff; }
+    .key:active { 
+  transform: scale(0.92);
+  transition: transform 0.1s ease-out;
+}
+.key:hover { background: #eef5ff; }
     .key.empty {
       background: transparent; border: none; cursor: default; box-shadow: none; height: var(--key-height);
     }
 
     .btn {
-      transition: transform 0.15s ease;
-    }
-    .btn:hover {
-      transform: scale(1.06);
-    }
-    .btn:active {
-      transform: scale(0.94);
-    }
-
+  transition: transform 0.2s ease-out;
+}
+.btn:active {
+  transform: scale(0.87);
+  transition: transform 0.1s ease-out;
+}
     .key:focus,
     .btn:focus {
       outline: none;
@@ -157,6 +157,16 @@
       padding: 3px 6px;
       font-size: 12px;
       min-width: 40px;
+      /* Увеличиваем высоту кнопок навигации */
+      height: 60px;
+    }
+
+    /* Кнопки навигации (Ѳѳ, Аа, √≈) делаем выше */
+    .jumpBtn {
+      height: 40px !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     @media (max-width: 900px) {
@@ -231,6 +241,52 @@
       .icon-btn img.icon-img, .icon-btn svg.icon-fallback { max-width: 18px; max-height: 18px; }
     }
 
+#copyBtn .icon-img {
+  width: 21px !important;
+  height: 28px !important;
+  max-width: none !important;
+  max-height: none !important;
+  display: block;
+  object-fit: contain;
+}
+#backspaceBtn .icon-img {
+  width: 30px !important;
+  height: 26px !important;
+  max-width: none !important;
+  max-height: none !important;
+  display: block;
+  object-fit: contain;
+  transform: translateX(-0.3px);
+
+}
+#spaceBtn {
+  /* Увеличиваем кнопку пробела в длину */
+  min-width: 50px !important;
+  width: 98px !important;
+}
+#spaceBtn .icon-img {
+  width: 28px !important;
+  height: 26px !important;
+  max-width: none !important;
+  max-height: none !important;
+  display: block;
+  object-fit: contain;
+  transform: translateY(3px);
+}
+#capsBtn .icon-img {
+  transform: translateX(0.6px);
+}
+
+/* Плавный возврат к нормальному размеру */
+.key, .btn, .icon-btn {
+  transition: transform 0.2s ease-out;
+}
+
+.key:not(:active), .btn:not(:active), .icon-btn:not(:active) {
+  transform: scale(1);
+}
+
+
   </style>
 </head>
 <body>
@@ -245,16 +301,16 @@
 
     <div class="keyboard" id="keyboard" aria-live="polite">
       <div class="controls">
-        <!-- Левый блок: чекбокс + иконки (copy / backspace / space / caps) -->
+
         <div class="legend">
           <div style="display:flex;align-items:center;gap:10px;">
             <label style="display:flex;align-items:center;gap:6px">
               <input type="checkbox" id="allowPhysical"> lock system keyboard
             </label>
 
-            <!-- copy all (icon button) -->
+
             <button class="btn icon-btn" id="copyBtn" title="Copy all" aria-label="Copy all">
-              <img class="icon-svg" src="./copy.svg" alt="copy" decoding="async" draggable="false"
+              <img class="icon-img" src="./copy.svg" alt="copy" decoding="async" draggable="false"
                    onload="this.style.display='inline-block'; this.parentNode.querySelector('.icon-fallback-copy').style.display='none';"
                    onerror="this.style.display='none'; this.parentNode.querySelector('.icon-fallback-copy').style.display='inline-block'">
               <svg class="icon-fallback icon-fallback-copy" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -263,9 +319,9 @@
               </svg>
             </button>
 
-            <!-- backspace (delete) -->
+
             <button class="btn icon-btn" id="backspaceBtn" title="Backspace / delete" aria-label="Backspace">
-              <img class="icon-img" src="./backspace.svg" alt="backspace" decoding="async" draggable="false"
+              <img class="icon-img" src="./backspace.svg" style="width: 1000px; height: 100px;" alt="backspace" decoding="async" draggable="false"
                    onload="this.style.display='inline-block'; this.parentNode.querySelector('.icon-fallback-back').style.display='none';"
                    onerror="this.style.display='none'; this.parentNode.querySelector('.icon-fallback-back').style.display='inline-block'">
               <svg class="icon-fallback icon-fallback-back" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -273,19 +329,7 @@
                 <path d="M15 9l-4 4M11 9l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
-
-            <!-- space -->
-            <button class="btn icon-btn" id="spaceBtn" title="Space" aria-label="Space">
-              <img class="icon-img" src="./space.svg" alt="space" decoding="async" draggable="false"
-                   onload="this.style.display='inline-block'; this.parentNode.querySelector('.icon-fallback-space').style.display='none';"
-                   onerror="this.style.display='none'; this.parentNode.querySelector('.icon-fallback-space').style.display='inline-block'">
-              <svg class="icon-fallback icon-fallback-space" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-                <rect x="3" y="10" width="18" height="4" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/>
-              </svg>
-            </button>
-
-            <!-- caps -->
-            <button class="btn icon-btn" id="capsBtn" title="Caps (click = one-time, dblclick = lock)" aria-label="Caps">
+                        <button class="btn icon-btn" id="capsBtn" title="Caps (click = one-time, dblclick = lock)" aria-label="Caps">
               <img class="icon-img" id="capsIcon" src="./caps.svg" alt="caps" decoding="async" draggable="false"
                    onload="this.style.display='inline-block'; this.parentNode.querySelector('.icon-fallback-caps').style.display='none';"
                    onerror="this.style.display='none'; this.parentNode.querySelector('.icon-fallback-caps').style.display='inline-block'">
@@ -296,20 +340,42 @@
 
           </div>
 
-<!-- Правый блок: переключатель + кнопки рядом -->
+
 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
   
-  <!-- переключатель темы слева -->
+
   <div class="theme-toggle" id="themeToggle">
     <div class="thumb" id="themeThumb">☀️</div>
   </div>
 
-  <!-- кнопки сразу справа от переключателя -->
+
   <button class="btn jumpBtn smallBtn" data-row="1" title="Scroll to row 5">Ѳѳ</button>
   <button class="btn jumpBtn smallBtn" data-row="14" title="Scroll to row 7">Аа</button>
   <button class="btn jumpBtn smallBtn" data-row="27" title="Scroll to row 9">√≈</button>
+<button class="btn icon-btn" id="spaceBtn" title="Space" aria-label="Space">
+              <img class="icon-img" src="./space.svg" alt="space" decoding="async" draggable="false"
+                   onload="this.style.display='inline-block'; this.parentNode.querySelector('.icon-fallback-space').style.display='none';"
+                   onerror="this.style.display='none'; this.parentNode.querySelector('.icon-fallback-space').style.display='inline-block'">
+              <svg class="icon-fallback icon-fallback-space" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="10" width="18" height="4" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/>
+              </svg>
+            </button>
 
 </div>
+
+        </div>
+
+        <div class="row-controls">
+          <div class="status" id="capsStatus"></div>
+          <div class="status small" id="colsStatus"></div>
+        </div>
+
+      </div>
+
+      <div class="rows" id="rowsContainer"></div>
+    </div>
+  </div>
+
   <script>
 
 (function ensureIconFallbacks() {
@@ -321,7 +387,7 @@
       if (fallback) fallback.style.display = 'inline-block';
       return;
     }
-    // если уже загрузился успешно (кеш), скрываем fallback
+
     if (img.complete && img.naturalWidth > 0) {
       img.style.display = 'inline-block';
       if (fallback) fallback.style.display = 'none';
@@ -329,7 +395,7 @@
       img.style.display = 'none';
       if (fallback) fallback.style.display = 'inline-block';
     } else {
-      // навесим обработчики
+
       img.addEventListener('load', () => {
         img.style.display = 'inline-block';
         if (fallback) fallback.style.display = 'none';
@@ -344,12 +410,12 @@
 </script>
 
   <script>
-/* === Твой JS (с защитными обёртками и автосозданием контейнера rowsContainer) === */
+
 
 (function () {
-  // --- Защитное окружение: ловим непойманные ошибки и не даём им ломать UI ---
+
   function safeLogError(err) {
-    // Можно показать overlay или лог в консоль. Пока — console.error.
+
     console.error('Webkbd error:', err);
   }
 
@@ -357,7 +423,7 @@
     try {
       safeLogError(ev.error || ev.message || ev);
     } catch (e) { console.error(e); }
-    // Попробуем безопасно перерендерить клавиши
+
     try { if (typeof safeRender === 'function') safeRender(); } catch (e) {}
   });
 
@@ -368,7 +434,7 @@
     try { if (typeof safeRender === 'function') safeRender(); } catch (e) {}
   });
 
-  // --- Исходные данные (без изменений) ---
+
   const KEYS_DEF = [
     ['а','ā','и','ӣ','у','ӯ'],
     ['рь','рь̄ ','љ','љ̄ '],
@@ -383,7 +449,7 @@
     ['щ','ш','с','х'],
     [' ','•','‿','⁀','ɐ'],
     ['ԑ̆ ','о̆ '],
-    [],
+
     ['а','б','в','г','е','ё'],
     ['ж','з','і','и','ѵ','к'],
     ['л','м','н','о','п','р'],
@@ -391,18 +457,18 @@
     ['ц','ч','ш','щ','ъ','ы'],
     ['ь','э','ю','я','ѣ'],
     ['!',',','.','…',':',';'],
-    ['?','¿','⸮','‘','’','❕'],
-    ['„','“','«','»','‹','›'],
+    
+    ['„','"','«','»','‹','›'],
     ['-','—','_','(',')'],
     ['1','2','3','4','5','6'],
     ['7','8','9','0'],
-    [],
+    [3],
     ['➀','➁','➂','➃','➄','➅'],
     ['➆','`','°','√','*','^'],
     ['+','=','≠','≥','±'],
     ['~','≈','|','/'],
     ['[',']','{','}','<','>'],
-    ['←','→','↓','↑','↙️','↗️']
+    ['←','→','↓','↑','↙','↗']
   ];
 
   const CAPS_MAP = new Map([
@@ -428,17 +494,17 @@
   const themeToggle    = document.getElementById('themeToggle');
   const themeThumb     = document.getElementById('themeThumb');
 
-  // Создаём rowsContainer автоматически, если его нет (фоллбек — для защиты)
+
   let rowsContainer  = document.getElementById('rowsContainer');
   if (!rowsContainer) {
     try {
       rowsContainer = document.createElement('div');
       rowsContainer.id = 'rowsContainer';
       rowsContainer.className = 'rows';
-      // пытаемся вставить внутри #keyboard (если есть), иначе после .controls, иначе в конец keyboardEl
+
       const controlsEl = keyboardEl.querySelector ? keyboardEl.querySelector('.controls') : null;
       if (controlsEl && controlsEl.parentNode) {
-        // вставляем после controls
+
         controlsEl.parentNode.insertBefore(rowsContainer, controlsEl.nextSibling);
       } else {
         keyboardEl.appendChild(rowsContainer);
@@ -448,9 +514,9 @@
     }
   }
 
-  // переменные состояния
+
   let maxCols = 6;
-  // capsState: 0 = off, 1 = single-use (dim), 2 = locked (green)
+
   let capsState = 0;
   let capsOn  = false;
   let darkOn  = false;
@@ -463,7 +529,7 @@
     } catch (e) { console.error(e); }
   }
 
-  // drag для переключателя темы (защищённо)
+
   try {
     let dragging = false;
     let startX = 0;
@@ -498,7 +564,7 @@
     });
   } catch (e) {}
 
-  // Save / Load
+
   function saveAll() {
     try {
       if (allowPhysical) localStorage.setItem(STORAGE_ALLOW, JSON.stringify(!!allowPhysical.checked));
@@ -574,7 +640,7 @@
     return applyCaps(originalVal);
   }
 
-  // Защищённый render — никогда не бросает исключение наружу
+
   function render() {
     try {
       if (!rowsContainer) {
@@ -589,7 +655,7 @@
         if (!rowsContainer) return;
       }
 
-      // очищаем аккуратно
+
       while (rowsContainer.firstChild) rowsContainer.removeChild(rowsContainer.firstChild);
 
       const rows = buildRows(KEYS_DEF, maxCols);
@@ -598,7 +664,7 @@
           const rowEl = document.createElement('div');
           rowEl.className = 'row';
           rowEl.style.gridTemplateColumns = 'repeat(' + maxCols + ', 1fr)';
-          // Если rowArr пустой — добавляем "пустую" ячейку, чтобы не ломать сетку
+
           if (!Array.isArray(rowArr) || rowArr.length === 0) {
             const emptyBtn = document.createElement('div');
             emptyBtn.className = 'key empty';
@@ -610,7 +676,7 @@
               btn.className = 'key';
               btn.textContent = displayTextForKey(val);
               btn.dataset.value = val;
-              // защищённый обработчик — не даст упасть всему исполняемому коду
+
               btn.addEventListener('pointerdown', function (ev) {
                 try {
                   insertAtCursor(val);
@@ -631,12 +697,12 @@
     }
   }
 
-  // NEW: безопасная функция, доступная глобально для попытки перерендера
+
   window.safeRender = function () {
     try { render(); } catch (e) { console.error('safeRender error', e); }
   };
 
-  // NEW: подпись на setInterval чтобы попытаться рендерить несколько раз, если что-то асинхронно мешало
+
   (function tryRenderRetry() {
     let attempts = 0;
     const maxAttempts = 10;
@@ -654,7 +720,7 @@
         }
         if (attempts >= maxAttempts) {
           clearInterval(id);
-          // оставляем попытку ещё раз через более долгий таймаут
+
           setTimeout(() => { try { render(); } catch (e) {} }, 1200);
         }
       } catch (e) {
@@ -664,7 +730,7 @@
   })();
 
 
-  // NEW: insertAtCursor — сохраняем поведение prohibit и сбрасываем single-use caps после вставки одного символа
+
   function insertAtCursor(textRaw) {
     try {
       const text = applyCaps(textRaw);
@@ -678,20 +744,20 @@
       const newPos = start + text.length;
       try { ta.setSelectionRange(newPos, newPos); } catch (e) {}
       if (prohibit) ta.readOnly = true;
-      // НЕ фокусируем textarea — чтобы системная клавиатура не открывалась при нажатии кнопок
+
       if (capsState === 1) {
         capsState = 0;
         capsOn = false;
         updateCapsUI();
         saveAll();
       }
-      // триггерим события изменения
+
       ta.dispatchEvent(new Event('input', { bubbles: true }));
       ta.dispatchEvent(new Event('change', { bubbles: true }));
     } catch (e) { console.error('insertAtCursor error', e); }
   }
 
-  // NEW: updateCapsUI (включает обновление текста клавиш и визуальные классы)
+
   function updateCapsUI() {
     try {
       if (!capsBtn) return;
@@ -699,7 +765,7 @@
       if (capsState === 1) capsBtn.classList.add('caps-dim');
       if (capsState === 2) capsBtn.classList.add('caps-green');
       capsOn = (capsState !== 0);
-      // обновляем текст кнопок даже если rowsContainer пуст — защищённо
+
       const keyButtons = (rowsContainer && rowsContainer.querySelectorAll) ? rowsContainer.querySelectorAll('.key') : document.querySelectorAll('.key');
       Array.from(keyButtons).forEach(btn => {
         try {
@@ -733,7 +799,6 @@
     } catch (e) { console.error('applyKeyboardProhibitMode error', e); }
   }
 
-  // Обработчики синхронизации и действий (с проверками)
   try {
     if (allowPhysical) {
       allowPhysical.addEventListener('change', function () {
@@ -742,7 +807,7 @@
     }
   } catch (e) {}
 
-  // copy all button
+
   try {
     if (copyBtn) copyBtn.addEventListener('click', async function () {
       try {
@@ -766,7 +831,7 @@
       try {
         const ta = mainText;
         if (!ta) return;
-        const prohibit = !!(allowPhysical && allowPhysical.checked); // true = заблокирована системная клавиатура
+        const prohibit = !!(allowPhysical && allowPhysical.checked); 
         const start = (typeof ta.selectionStart === 'number') ? ta.selectionStart : ta.value.length;
         const end = (typeof ta.selectionEnd === 'number') ? ta.selectionEnd : start;
         if (prohibit) ta.readOnly = false;
@@ -793,7 +858,7 @@
     }, { passive: true });
   } catch (e) {}
 
-  // === CAPS: click = one-use toggle, dblclick = lock ===
+ 
   try {
     if (capsBtn) {
       capsBtn.addEventListener('click', function (e) {
@@ -820,7 +885,7 @@
     }
   } catch (e) {}
 
-  // Jump buttons
+
   try {
     function jumpToRow(n) {
       try {
@@ -848,7 +913,7 @@
     if (rowsContainer) rowsContainer.addEventListener('touchmove', function(e){ }, { passive: true });
   } catch (e) {}
 
-  // Инициализация
+
   try {
     loadAll();
     applyKeyboardProhibitMode();
