@@ -25,7 +25,7 @@
       background: #f5f7fa;
       color: #111;
     }
-    * { font-family: 'Andika'}
+    * { font-family: 'Andika' }
 
     .app { display: flex; height: 100vh; gap: 12px; padding: 12px; box-sizing: border-box; }
     .editor { flex: 1; display: flex; flex-direction: column; }
@@ -67,7 +67,17 @@
     .status { font-size: 13px; color: inherit; }
     .small { font-size: 12px; opacity: .85; }
 
-    .rows { display: flex; flex-direction: column; gap: 10px; overflow: auto; max-height: 84vh; padding-right: 6px; }
+    /* updated .rows: allow touch scrolling */
+    .rows {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: auto;
+      max-height: 84vh;
+      padding-right: 6px;
+      touch-action: pan-y; /* allow vertical pan on touch devices */
+      -webkit-overflow-scrolling: touch;
+    }
 
     .row { display: grid; gap: var(--gap); }
     .key {
@@ -159,10 +169,8 @@
       padding: 3px 6px;
       font-size: 12px;
       min-width: 40px;
-    
       height: 60px;
     }
-
 
     .jumpBtn {
       height: 40px !important;
@@ -183,9 +191,16 @@
         max-height: 48vh;
       }
 
+      /* mobile-specific rows height + touch settings */
+      .rows {
+        max-height: 48vh;
+        touch-action: pan-y;
+        -webkit-overflow-scrolling: touch;
+      }
 
-
-.rows { max-height: 23vh; } textarea#mainText { font-size: 19px; min-height: 40vh; } .editor { order: 1; } }
+      textarea#mainText { font-size: 19px; min-height: 40vh; }
+      .editor { order: 1; }
+    }
 
     body.dark { background: #000; color: #fff; }
     body.dark .app { color: #fff; }
@@ -256,10 +271,8 @@
   display: block;
   object-fit: contain;
   transform: translateX(-0.3px);
-
 }
 #spaceBtn {
-
   min-width: 120px !important;
   width: 120px !important;
 }
@@ -275,8 +288,6 @@
 #capsBtn .icon-img {
   transform: translateX(0.6px);
 }
-
-
 
   </style>
 </head>
@@ -299,7 +310,6 @@
               <input type="checkbox" id="allowPhysical"> lock system keyboard
             </label>
 
-
             <button class="btn icon-btn" id="copyBtn" title="Copy all" aria-label="Copy all">
               <img class="icon-img" src="./copy.svg" alt="copy" decoding="async" draggable="false"
                    onload="this.style.display='inline-block'; this.parentNode.querySelector('.icon-fallback-copy').style.display='none';"
@@ -310,7 +320,6 @@
               </svg>
             </button>
 
-
             <button class="btn icon-btn" id="backspaceBtn" title="Backspace / delete" aria-label="Backspace">
               <img class="icon-img" src="./backspace.svg" style="width: 1000px; height: 100px;" alt="backspace" decoding="async" draggable="false"
                    onload="this.style.display='inline-block'; this.parentNode.querySelector('.icon-fallback-back').style.display='none';"
@@ -320,7 +329,8 @@
                 <path d="M15 9l-4 4M11 9l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
-                        <button class="btn icon-btn" id="capsBtn" title="Caps (click = one-time, dblclick = lock)" aria-label="Caps">
+
+            <button class="btn icon-btn" id="capsBtn" title="Caps (click = one-time, dblclick = lock)" aria-label="Caps">
               <img class="icon-img" id="capsIcon" src="./caps.svg" alt="caps" decoding="async" draggable="false"
                    onload="this.style.display='inline-block'; this.parentNode.querySelector('.icon-fallback-caps').style.display='none';"
                    onerror="this.style.display='none'; this.parentNode.querySelector('.icon-fallback-caps').style.display='inline-block'">
@@ -331,26 +341,23 @@
 
           </div>
 
-
 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-  
 
   <div class="theme-toggle" id="themeToggle">
     <div class="thumb" id="themeThumb">☀️</div>
   </div>
 
-
   <button class="btn jumpBtn smallBtn" data-row="1" title="Scroll to row 5">Ѳѳ</button>
   <button class="btn jumpBtn smallBtn" data-row="14" title="Scroll to row 7">Аа</button>
   <button class="btn jumpBtn smallBtn" data-row="27" title="Scroll to row 9">√≈</button>
-<button class="btn icon-btn" id="spaceBtn" title="Space" aria-label="Space">
-              <img class="icon-img" src="./space.svg" alt="space" decoding="async" draggable="false"
-                   onload="this.style.display='inline-block'; this.parentNode.querySelector('.icon-fallback-space').style.display='none';"
-                   onerror="this.style.display='none'; this.parentNode.querySelector('.icon-fallback-space').style.display='inline-block'">
-              <svg class="icon-fallback icon-fallback-space" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-                <rect x="3" y="10" width="18" height="4" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/>
-              </svg>
-            </button>
+  <button class="btn icon-btn" id="spaceBtn" title="Space" aria-label="Space">
+    <img class="icon-img" src="./space.svg" alt="space" decoding="async" draggable="false"
+         onload="this.style.display='inline-block'; this.parentNode.querySelector('.icon-fallback-space').style.display='none';"
+         onerror="this.style.display='none'; this.parentNode.querySelector('.icon-fallback-space').style.display='inline-block'">
+    <svg class="icon-fallback icon-fallback-space" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="10" width="18" height="4" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/>
+    </svg>
+  </button>
 
 </div>
 
@@ -402,11 +409,9 @@
 
   <script>
 
-
 (function () {
 
   function safeLogError(err) {
-
     console.error('Webkbd error:', err);
   }
 
@@ -428,8 +433,52 @@
 
   function addPointerListeners(target, type, handler, options) {
     options = options || {};
-    function wrapper(ev){
+
+    // Выберем подходящую стратегию в зависимости от возможностей платформы
+    const supportsPointer = typeof window.PointerEvent !== 'undefined';
+    const supportsTouch = 'ontouchstart' in window;
+
+    const map = (function() {
+      if (supportsPointer) {
+        return {
+          down: ['pointerdown'],
+          move: ['pointermove'],
+          up:   ['pointerup','pointercancel'],
+          click:['click'] // use click for activation
+        };
+      } else if (supportsTouch) {
+        return {
+          down: ['touchstart'],
+          move: ['touchmove'],
+          up:   ['touchend','touchcancel'],
+          click:['click','touchend']
+        };
+      } else {
+        return {
+          down: ['mousedown'],
+          move: ['mousemove'],
+          up:   ['mouseup'],
+          click:['click']
+        };
+      }
+    })();
+
+    const evNames = map[type] || [type];
+
+    // Debounce/dedupe: игнорируем повторный вызов на том же target в короткий интервал
+    // (защищает от редких двойных срабатываний)
+    if (!target.__lastPointerTime) target.__lastPointerTime = 0;
+
+    function wrapper(ev) {
       try {
+        // Дедуп: если событие пришло буквально сразу после предыдущего для этого элемента — игнорируем
+        const now = Date.now();
+        if (now - target.__lastPointerTime < 40) {
+          return;
+        }
+        target.__lastPointerTime = now;
+
+        // Нормализация для touch: используем первый touch
         if (ev && ev.type && ev.type.indexOf('touch') === 0 && ev.changedTouches && ev.changedTouches.length) {
           const t = ev.changedTouches[0];
           const synth = {
@@ -437,10 +486,12 @@
             type: ev.type,
             clientX: t.clientX,
             clientY: t.clientY,
+            pointerType: 'touch',
             preventDefault: function(){ try { ev.preventDefault(); } catch(e){} }
           };
           handler.call(this, synth, ev);
         } else {
+          // pointer или mouse или click
           handler.call(this, ev, ev);
         }
       } catch (err) {
@@ -448,24 +499,15 @@
       }
     }
 
-    const map = {
-      down: ['pointerdown','touchstart','mousedown'],
-      move: ['pointermove','touchmove','mousemove'],
-      up:   ['pointerup','touchend','mouseup','touchcancel'],
-      click:['click','touchend']
-    };
-    const evNames = map[type] || [type];
-
     evNames.forEach(name => {
       try {
+        // Используем options как есть; если добавление с options падает — пробуем без него
         target.addEventListener(name, wrapper, options);
       } catch (e) {
         try { target.addEventListener(name, wrapper, !!options.capture); } catch (e2) {}
       }
     });
   }
-
-
 
   const KEYS_DEF = [
     ['а','ā','и','ӣ','у','ӯ'],
@@ -479,7 +521,7 @@
     ['п','п᷉','б','б᷉','м'],
     ['й','р','л','в'],
     ['щ','ш','с','х'],
-    [' ','•','‿','⁀','ɐ'],
+    ['•','‿','⁀','ɐ'],
     ['ԑ̆ ','о̆ '],
 
     ['а','б','в','г','е','ё'],
@@ -489,12 +531,12 @@
     ['ц','ч','ш','щ','ъ','ы'],
     ['ь','э','ю','я','ѣ'],
     ['!',',','.','…',':',';'],
-    
+
     ['„','"','«','»','‹','›'],
     ['-','—','_','(',')'],
     ['1','2','3','4','5','6'],
     ['7','8','9','0'],
-    [3],
+
     ['➀','➁','➂','➃','➄','➅'],
     ['➆','`','°','√','*','^'],
     ['+','=','≠','≥','±'],
@@ -503,54 +545,42 @@
     ['←','→','↓','↑','↙','↗']
   ];
 
+  const CAPS_MAP = new Map([
+    ['а','А'], ['ā','Ā'], ['и','И'], ['ӣ','Ӣ'], ['у','У'], ['ӯ','Ӯ'],
+    ['рь','РЬ'], ['рь̄ ','РЬ̄ '], ['љ','Љ'], ['љ̄','Љ̄'],
+    ['ԑ','Ԑ'], ['о','О'], ['⦂','⦂'], ['ә','Ә'], ['ɔ','Ɔ'], ['ᵒ','ᵒ'],
+    ['к','К'], ['к᷉','К᷉'], ['г','Г'], ['г᷉','Г᷉'], ['ӈ','Ӈ'],
+    ['ч','Ч'], ['ч᷉','Ч᷉'], ['џ','Џ'], ['џ᷉','Џ᷉'], ['њ','Њ'],
+    ['ԏ','Ԏ'], ['ԏ᷉','Ԏ᷉'], ['ԃ','Ԃ'], ['ԃ᷉','Ԃ᷉'], ['ԋ','Ԋ'],
+    ['т','Т'], ['т᷉','Т᷉'], ['д','Д'], ['д᷉','Д᷉'], ['н','Н'],
+    ['п','П'], ['п᷉','П᷉'], ['б','Б'], ['б᷉','Б᷉'], ['м','М'],
+    ['й','Й'], ['р','Р'], ['л','Л'], ['в','В'],
+    ['щ','Щ'], ['ш','Ш'], ['с','С'], ['х','Х'], ['ԉ','Ԉ'],
+    ['а','А'], ['б','Б'], ['в','В'], ['г','Г'], ['д','Д'], ['е','Е'], ['ё','Ё'],
+    ['ж','Ж'], ['з','З'], ['і','І'], ['и','И'], ['ѵ','Ѵ'], ['к','К'], ['л','Л'],
+    ['м','М'], ['н','Н'], ['о','О'], ['п','П'], ['р','Р'], ['с','С'], ['т','Т'],
+    ['у','У'], ['ф','Ф'], ['ѳ','Ѳ'], ['х','Х'], ['ц','Ц'], ['ч','Ч'], ['ш','Ш'],
+    ['щ','Щ'], ['ъ','Ъ'], ['ы','Ы'], ['ь','Ь'], ['э','Э'], ['ю','Ю'], ['я','Я'],
+    ['ѣ','Ѣ'],
+  ]);
 
-const CAPS_MAP = new Map([
-
-
-
-  ['а','А'], ['ā','Ā'], ['и','И'], ['ӣ','Ӣ'], ['у','У'], ['ӯ','Ӯ'],
-  ['рь','РЬ'], ['рь̄ ','РЬ̄ '], ['љ','Љ'], ['љ̄','Љ̄'],
-  
-  ['ԑ','Ԑ'], ['о','О'], ['⦂','⦂'], ['ә','Ә'], ['ɔ','Ɔ'], ['ᵒ','ᵒ'],
-  
-  ['к','К'], ['к᷉','К᷉'], ['г','Г'], ['г᷉','Г᷉'], ['ӈ','Ӈ'],
-  ['ч','Ч'], ['ч᷉','Ч᷉'], ['џ','Џ'], ['џ᷉','Џ᷉'], ['њ','Њ'],
-  
-  ['ԏ','Ԏ'], ['ԏ᷉','Ԏ᷉'], ['ԃ','Ԃ'], ['ԃ᷉','Ԃ᷉'], ['ԋ','Ԋ'],
-  ['т','Т'], ['т᷉','Т᷉'], ['д','Д'], ['д᷉','Д᷉'], ['н','Н'],
-  ['п','П'], ['п᷉','П᷉'], ['б','Б'], ['б᷉','Б᷉'], ['м','М'],
-  
-  ['й','Й'], ['р','Р'], ['л','Л'], ['в','В'],
-  ['щ','Щ'], ['ш','Ш'], ['с','С'], ['х','Х'], ['ԉ','Ԉ'],
-  
-
-  ['а','А'], ['б','Б'], ['в','В'], ['г','Г'], ['д','Д'], ['е','Е'], ['ё','Ё'],
-  ['ж','Ж'], ['з','З'], ['і','І'], ['и','И'], ['ѵ','Ѵ'], ['к','К'], ['л','Л'],
-  ['м','М'], ['н','Н'], ['о','О'], ['п','П'], ['р','Р'], ['с','С'], ['т','Т'],
-  ['у','У'], ['ф','Ф'], ['ѳ','Ѳ'], ['х','Х'], ['ц','Ц'], ['ч','Ч'], ['ш','Ш'],
-  ['щ','Щ'], ['ъ','Ъ'], ['ы','Ы'], ['ь','Ь'], ['э','Э'], ['ю','Ю'], ['я','Я'],
-  ['ѣ','Ѣ'],
-]);
-
-function applyCaps(text) {
-  if (!text) return text;
-  if (!capsOn) return text;
-  let res = String(text).normalize('NFC');
-  const entries = Array.from(CAPS_MAP.entries()).sort((a, b) => b[0].length - a[0].length);
-  for (const [k, v] of entries) {
-    if (!k) continue;
-
-    if (res.indexOf(k) === -1) continue;
-    res = res.split(k).join(v);
+  function applyCaps(text) {
+    if (!text) return text;
+    if (!capsOn) return text;
+    let res = String(text).normalize('NFC');
+    const entries = Array.from(CAPS_MAP.entries()).sort((a, b) => b[0].length - a[0].length);
+    for (const [k, v] of entries) {
+      if (!k) continue;
+      if (res.indexOf(k) === -1) continue;
+      res = res.split(k).join(v);
+    }
+    return res;
   }
-  return res;
-}
 
   const STORAGE_ALLOW = 'webkbd_allow_v5';
   const STORAGE_COLS  = 'webkbd_cols_v3';
   const STORAGE_CAPS  = 'webkbd_caps_v2';
   const STORAGE_THEME = 'webkbd_theme_v1';
-
 
   const keyboardEl     = document.getElementById('keyboard') || document.querySelector('.keyboard') || document.body;
   const allowPhysical  = document.getElementById('allowPhysical');
@@ -562,7 +592,6 @@ function applyCaps(text) {
   const themeToggle    = document.getElementById('themeToggle');
   const themeThumb     = document.getElementById('themeThumb');
 
-
   let rowsContainer  = document.getElementById('rowsContainer');
   if (!rowsContainer) {
     try {
@@ -572,7 +601,6 @@ function applyCaps(text) {
 
       const controlsEl = keyboardEl.querySelector ? keyboardEl.querySelector('.controls') : null;
       if (controlsEl && controlsEl.parentNode) {
-
         controlsEl.parentNode.insertBefore(rowsContainer, controlsEl.nextSibling);
       } else {
         keyboardEl.appendChild(rowsContainer);
@@ -581,7 +609,6 @@ function applyCaps(text) {
       console.error('Не удалось создать rowsContainer автоматически', e);
     }
   }
-
 
   let maxCols = 6;
 
@@ -596,7 +623,6 @@ function applyCaps(text) {
       if (themeThumb) themeThumb.textContent = darkOn ? "🌙" : "☀️";
     } catch (e) { console.error(e); }
   }
-
 
   try {
     let dragging = false;
@@ -633,7 +659,6 @@ function applyCaps(text) {
       } catch (ex) {}
     }, { passive: true });
   } catch (e) {}
-
 
   function saveAll() {
     try {
@@ -743,7 +768,6 @@ function applyCaps(text) {
         if (!rowsContainer) return;
       }
 
-
       while (rowsContainer.firstChild) rowsContainer.removeChild(rowsContainer.firstChild);
 
       const rows = buildRows(KEYS_DEF, maxCols);
@@ -765,12 +789,12 @@ function applyCaps(text) {
               btn.textContent = displayTextForKey(val);
               btn.dataset.value = val;
 
-              addPointerListeners(btn, 'down', function (ev) {
-                if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+              // use native click to avoid double events on touch devices and not block scroll
+              btn.addEventListener('click', function (ev) {
                 try {
                   insertAtCursor(val);
                 } catch (e) { console.error('insertAtCursor failed', e); }
-              }, { passive: false });
+              }, { passive: true });
 
               rowEl.appendChild(btn);
             });
@@ -787,11 +811,9 @@ function applyCaps(text) {
     }
   }
 
-
   window.safeRender = function () {
     try { render(); } catch (e) { console.error('safeRender error', e); }
   };
-
 
   (function tryRenderRetry() {
     let attempts = 0;
@@ -810,7 +832,6 @@ function applyCaps(text) {
         }
         if (attempts >= maxAttempts) {
           clearInterval(id);
-
           setTimeout(() => { try { render(); } catch (e) {} }, 1200);
         }
       } catch (e) {
@@ -818,8 +839,6 @@ function applyCaps(text) {
       }
     }, 200);
   })();
-
-
 
   function insertAtCursor(textRaw) {
     try {
@@ -847,7 +866,6 @@ function applyCaps(text) {
       ta.dispatchEvent(new Event('change', { bubbles: true }));
     } catch (e) { console.error('insertAtCursor error', e); }
   }
-
 
   function updateCapsUI() {
     try {
@@ -902,7 +920,6 @@ function applyCaps(text) {
     }
   } catch (e) {}
 
-
   try {
     if (copyBtn) copyBtn.addEventListener('click', async function () {
       try {
@@ -926,7 +943,7 @@ function applyCaps(text) {
       try {
         const ta = mainText;
         if (!ta) return;
-        const prohibit = !!(allowPhysical && allowPhysical.checked); 
+        const prohibit = !!(allowPhysical && allowPhysical.checked);
         const start = (typeof ta.selectionStart === 'number') ? ta.selectionStart : ta.value.length;
         const end = (typeof ta.selectionEnd === 'number') ? ta.selectionEnd : start;
         if (prohibit) ta.readOnly = false;
@@ -953,7 +970,6 @@ function applyCaps(text) {
     }, { passive: true });
   } catch (e) {}
 
- 
   try {
     if (capsBtn) {
       capsBtn.addEventListener('click', function (e) {
@@ -969,7 +985,6 @@ function applyCaps(text) {
           saveAll();
         } catch (e) { console.error('caps click error', e); }
       }, { passive: true });
-
 
       (function setupCapsTouchFallback(){
         let lastTap = 0;
@@ -1005,7 +1020,6 @@ function applyCaps(text) {
     }
   } catch (e) {}
 
-
   try {
     function jumpToRow(n) {
       try {
@@ -1032,7 +1046,6 @@ function applyCaps(text) {
   try {
     if (rowsContainer) rowsContainer.addEventListener('touchmove', function(e){ }, { passive: true });
   } catch (e) {}
-
 
   try {
     loadAll();
