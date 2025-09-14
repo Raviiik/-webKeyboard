@@ -21,11 +21,11 @@
     html, body {
       height: 100%;
       margin: 0;
-      font-family: 'Andika', Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      font-family: 'Andika';
       background: #f5f7fa;
       color: #111;
     }
-    * { font-family: 'Andika', sans-serif !important; }
+    * { font-family: 'Andika'}
 
     .app { display: flex; height: 100vh; gap: 12px; padding: 12px; box-sizing: border-box; }
     .editor { flex: 1; display: flex; flex-direction: column; }
@@ -65,7 +65,7 @@
     .status { font-size: 13px; color: inherit; }
     .small { font-size: 12px; opacity: .85; }
 
-    .rows { display: flex; flex-direction: column; gap: 10px; overflow: auto; max-height: 38vh; padding-right: 6px; }
+    .rows { display: flex; flex-direction: column; gap: 10px; overflow: auto; max-height: 84vh; padding-right: 6px; }
 
     .row { display: grid; gap: var(--gap); }
     .key {
@@ -86,22 +86,22 @@
       touch-action: manipulation;
       color: #111;
     }
-    .key:active { 
-  transform: scale(0.92);
-  transition: transform 0.1s ease-out;
-}
-.key:hover { background: #eef5ff; }
+    .key:active { transform: translateY(1px) scale(.99); }
+    .key:hover { background: #eef5ff; }
     .key.empty {
       background: transparent; border: none; cursor: default; box-shadow: none; height: var(--key-height);
     }
 
     .btn {
-  transition: transform 0.2s ease-out;
-}
-.btn:active {
-  transform: scale(0.87);
-  transition: transform 0.1s ease-out;
-}
+      transition: transform 0.15s ease;
+    }
+    .btn:hover {
+      transform: scale(1.06);
+    }
+    .btn:active {
+      transform: scale(0.94);
+    }
+
     .key:focus,
     .btn:focus {
       outline: none;
@@ -157,11 +157,11 @@
       padding: 3px 6px;
       font-size: 12px;
       min-width: 40px;
-      /* Увеличиваем высоту кнопок навигации */
+    
       height: 60px;
     }
 
-    /* Кнопки навигации (Ѳѳ, Аа, √≈) делаем выше */
+
     .jumpBtn {
       height: 40px !important;
       display: flex;
@@ -180,13 +180,10 @@
         box-shadow: 0 -2px 18px rgba(20,30,50,0.18);
         max-height: 48vh;
       }
-      .rows { max-height: 23vh; }
-      textarea#mainText {
-        font-size: 19px;
-        min-height: 40vh;
-      }
-      .editor { order: 1; }
-    }
+
+
+
+.rows { max-height: 23vh; } textarea#mainText { font-size: 19px; min-height: 40vh; } .editor { order: 1; } }
 
     body.dark { background: #000; color: #fff; }
     body.dark .app { color: #fff; }
@@ -260,9 +257,9 @@
 
 }
 #spaceBtn {
-  /* Увеличиваем кнопку пробела в длину */
-  min-width: 50px !important;
-  width: 98px !important;
+
+  min-width: 120px !important;
+  width: 120px !important;
 }
 #spaceBtn .icon-img {
   width: 28px !important;
@@ -277,14 +274,6 @@
   transform: translateX(0.6px);
 }
 
-/* Плавный возврат к нормальному размеру */
-.key, .btn, .icon-btn {
-  transition: transform 0.2s ease-out;
-}
-
-.key:not(:active), .btn:not(:active), .icon-btn:not(:active) {
-  transform: scale(1);
-}
 
 
   </style>
@@ -435,6 +424,47 @@
   });
 
 
+  function addPointerListeners(target, type, handler, options) {
+    options = options || {};
+    function wrapper(ev){
+      try {
+        if (ev && ev.type && ev.type.indexOf('touch') === 0 && ev.changedTouches && ev.changedTouches.length) {
+          const t = ev.changedTouches[0];
+          const synth = {
+            originalEvent: ev,
+            type: ev.type,
+            clientX: t.clientX,
+            clientY: t.clientY,
+            preventDefault: function(){ try { ev.preventDefault(); } catch(e){} }
+          };
+          handler.call(this, synth, ev);
+        } else {
+          handler.call(this, ev, ev);
+        }
+      } catch (err) {
+        try { handler.call(this, ev, ev); } catch(e){}
+      }
+    }
+
+    const map = {
+      down: ['pointerdown','touchstart','mousedown'],
+      move: ['pointermove','touchmove','mousemove'],
+      up:   ['pointerup','touchend','mouseup','touchcancel'],
+      click:['click','touchend']
+    };
+    const evNames = map[type] || [type];
+
+    evNames.forEach(name => {
+      try {
+        target.addEventListener(name, wrapper, options);
+      } catch (e) {
+        try { target.addEventListener(name, wrapper, !!options.capture); } catch (e2) {}
+      }
+    });
+  }
+
+
+
   const KEYS_DEF = [
     ['а','ā','и','ӣ','у','ӯ'],
     ['рь','рь̄ ','љ','љ̄ '],
@@ -471,19 +501,55 @@
     ['←','→','↓','↑','↙','↗']
   ];
 
-  const CAPS_MAP = new Map([
-    ['а','А'],['б','Б'],['в','В'],['г','Г'],['д','Д'],['е','Е'],['ё','Ё'],['ж','Ж'],['з','З'],
-    ['і','І'],['и','И'],['ѵ','Ѵ'],['к','К'],['л','Л'],['м','М'],['н','Н'],['о','О'],['п','П'],
-    ['р','Р'],['с','С'],['т','Т'],['у','У'],['ф','Ф'],['ѳ','Ѳ'],['х','Х'],['ц','Ц'],['ч','Ч'],
-    ['ш','Ш'],['щ','Щ'],['ъ','Ъ'],['ы','Ы'],['ь','Ь'],['э','Э'],['ю','Ю'],['я','Я'],['ѣ','Ѣ']
-  ]);
+
+const CAPS_MAP = new Map([
+
+
+
+  ['а','А'], ['ā','Ā'], ['и','И'], ['ӣ','Ӣ'], ['у','У'], ['ӯ','Ӯ'],
+  ['рь','РЬ'], ['рь̄ ','РЬ̄ '], ['љ','Љ'], ['љ̄','Љ̄'],
+  
+  ['ԑ','Ԑ'], ['о','О'], ['⦂','⦂'], ['ә','Ә'], ['ɔ','Ɔ'], ['ᵒ','ᵒ'],
+  
+  ['к','К'], ['к᷉','К᷉'], ['г','Г'], ['г᷉','Г᷉'], ['ӈ','Ӈ'],
+  ['ч','Ч'], ['ч᷉','Ч᷉'], ['џ','Џ'], ['џ᷉','Џ᷉'], ['њ','Њ'],
+  
+  ['ԏ','Ԏ'], ['ԏ᷉','Ԏ᷉'], ['ԃ','Ԃ'], ['ԃ᷉','Ԃ᷉'], ['ԋ','Ԋ'],
+  ['т','Т'], ['т᷉','Т᷉'], ['д','Д'], ['д᷉','Д᷉'], ['н','Н'],
+  ['п','П'], ['п᷉','П᷉'], ['б','Б'], ['б᷉','Б᷉'], ['м','М'],
+  
+  ['й','Й'], ['р','Р'], ['л','Л'], ['в','В'],
+  ['щ','Щ'], ['ш','Ш'], ['с','С'], ['х','Х'], ['ԉ','Ԉ'],
+  
+
+  ['а','А'], ['б','Б'], ['в','В'], ['г','Г'], ['д','Д'], ['е','Е'], ['ё','Ё'],
+  ['ж','Ж'], ['з','З'], ['і','І'], ['и','И'], ['ѵ','Ѵ'], ['к','К'], ['л','Л'],
+  ['м','М'], ['н','Н'], ['о','О'], ['п','П'], ['р','Р'], ['с','С'], ['т','Т'],
+  ['у','У'], ['ф','Ф'], ['ѳ','Ѳ'], ['х','Х'], ['ц','Ц'], ['ч','Ч'], ['ш','Ш'],
+  ['щ','Щ'], ['ъ','Ъ'], ['ы','Ы'], ['ь','Ь'], ['э','Э'], ['ю','Ю'], ['я','Я'],
+  ['ѣ','Ѣ'],
+]);
+
+function applyCaps(text) {
+  if (!text) return text;
+  if (!capsOn) return text;
+  let res = String(text).normalize('NFC');
+  const entries = Array.from(CAPS_MAP.entries()).sort((a, b) => b[0].length - a[0].length);
+  for (const [k, v] of entries) {
+    if (!k) continue;
+
+    if (res.indexOf(k) === -1) continue;
+    res = res.split(k).join(v);
+  }
+  return res;
+}
 
   const STORAGE_ALLOW = 'webkbd_allow_v5';
   const STORAGE_COLS  = 'webkbd_cols_v3';
   const STORAGE_CAPS  = 'webkbd_caps_v2';
   const STORAGE_THEME = 'webkbd_theme_v1';
 
-  // --- Елементы DOM (с проверкой) ---
+
   const keyboardEl     = document.getElementById('keyboard') || document.querySelector('.keyboard') || document.body;
   const allowPhysical  = document.getElementById('allowPhysical');
   const mainText       = document.getElementById('mainText');
@@ -534,34 +600,36 @@
     let dragging = false;
     let startX = 0;
     if (themeThumb) {
-      themeThumb.addEventListener("pointerdown", (e) => {
+      addPointerListeners(themeThumb, 'down', (e) => {
         dragging = true;
-        startX = e.clientX;
-      });
+        startX = e.clientX || 0;
+      }, { passive: true });
     }
-    document.addEventListener("pointermove", (e) => {
+
+    addPointerListeners(document, 'move', (e) => {
       try {
         if (!dragging || !themeThumb) return;
-        let dx = e.clientX - startX;
+        let dx = (e.clientX || 0) - startX;
         if (!darkOn) {
           themeThumb.style.left = Math.min(Math.max(4 + dx, 4), 56) + "px";
         } else {
           themeThumb.style.left = Math.min(Math.max(56 + dx, 4), 56) + "px";
         }
       } catch (ex) {}
-    });
-    document.addEventListener("pointerup", (e) => {
+    }, { passive: true });
+
+    addPointerListeners(document, 'up', (e) => {
       try {
         if (!dragging) return;
         dragging = false;
-        let dx = e.clientX - startX;
+        let dx = (e.clientX || 0) - startX;
         if (dx > 20) darkOn = true;
         if (dx < -20) darkOn = false;
         applyTheme();
         saveAll();
         if (themeThumb) themeThumb.style.left = "";
       } catch (ex) {}
-    });
+    }, { passive: true });
   } catch (e) {}
 
 
@@ -640,6 +708,24 @@
     return applyCaps(originalVal);
   }
 
+  function setSelectionSafe(ta, start, end){
+    try { if (typeof ta.focus === 'function') ta.focus(); } catch(e){}
+    try {
+      if (typeof ta.setSelectionRange === 'function') {
+        ta.setSelectionRange(start, end);
+      } else if (ta.createTextRange) {
+        const range = ta.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', end);
+        range.moveStart('character', start);
+        range.select();
+      }
+    } catch (e) {}
+  }
+
+  function smoothScrollTo(el, top){
+    try { if (el.scrollTo) el.scrollTo({ top: top, behavior: 'smooth' }); else el.scrollTop = top; } catch(e){ el.scrollTop = top; }
+  }
 
   function render() {
     try {
@@ -677,11 +763,13 @@
               btn.textContent = displayTextForKey(val);
               btn.dataset.value = val;
 
-              btn.addEventListener('pointerdown', function (ev) {
+              addPointerListeners(btn, 'down', function (ev) {
+                if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
                 try {
                   insertAtCursor(val);
                 } catch (e) { console.error('insertAtCursor failed', e); }
-              }, { passive: true });
+              }, { passive: false });
+
               rowEl.appendChild(btn);
             });
           }
@@ -742,7 +830,8 @@
       const end = (typeof ta.selectionEnd === 'number') ? ta.selectionEnd : start;
       ta.value = ta.value.substring(0, start) + text + ta.value.substring(end);
       const newPos = start + text.length;
-      try { ta.setSelectionRange(newPos, newPos); } catch (e) {}
+
+      setSelectionSafe(ta, newPos, newPos);
       if (prohibit) ta.readOnly = true;
 
       if (capsState === 1) {
@@ -785,13 +874,17 @@
         mainText.readOnly = true;
         const blurOnFocus = (e) => { e.preventDefault(); mainText.blur(); };
         mainText.__blurOnFocus = blurOnFocus;
-        mainText.addEventListener('focus', blurOnFocus, { passive: false });
+        try {
+          mainText.addEventListener('focus', blurOnFocus, { passive: false });
+        } catch(e) {
+          try { mainText.addEventListener('focus', blurOnFocus, false); } catch(e){}
+        }
         mainText.blur();
       } else {
         mainText.removeAttribute('inputmode');
         mainText.readOnly = false;
         if (mainText.__blurOnFocus) {
-          mainText.removeEventListener('focus', mainText.__blurOnFocus);
+          try { mainText.removeEventListener('focus', mainText.__blurOnFocus); } catch(e){}
           delete mainText.__blurOnFocus;
         }
       }
@@ -839,11 +932,11 @@
           if (start > 0) {
             const newPos = start - 1;
             ta.value = ta.value.slice(0, newPos) + ta.value.slice(end);
-            try { ta.setSelectionRange(newPos, newPos); } catch (e) {}
+            try { setSelectionSafe(ta, newPos, newPos); } catch (e) {}
           }
         } else {
           ta.value = ta.value.slice(0, start) + ta.value.slice(end);
-          try { ta.setSelectionRange(start, start); } catch (e) {}
+          try { setSelectionSafe(ta, start, start); } catch (e) {}
         }
         ta.dispatchEvent(new Event('input', { bubbles: true }));
         ta.dispatchEvent(new Event('change', { bubbles: true }));
@@ -875,13 +968,38 @@
         } catch (e) { console.error('caps click error', e); }
       }, { passive: true });
 
-      capsBtn.addEventListener('dblclick', function (e) {
-        try {
-          capsState = 2;
-          updateCapsUI();
-          saveAll();
-        } catch (e) {}
-      }, { passive: true });
+
+      (function setupCapsTouchFallback(){
+        let lastTap = 0;
+        let tapCount = 0;
+        let longpressTimer = null;
+
+        addPointerListeners(capsBtn, 'down', (ev) => {
+          const now = Date.now();
+          if (now - lastTap < 350) tapCount++; else tapCount = 1;
+          lastTap = now;
+
+          clearTimeout(longpressTimer);
+          longpressTimer = setTimeout(() => {
+            capsState = 2; updateCapsUI(); saveAll(); tapCount = 0;
+          }, 500);
+        }, { passive: true });
+
+        addPointerListeners(capsBtn, 'up', (ev) => {
+          clearTimeout(longpressTimer);
+          if (tapCount === 2) { capsState = 2; updateCapsUI(); saveAll(); tapCount = 0; }
+        }, { passive: true });
+      })();
+
+      try {
+        capsBtn.addEventListener('dblclick', function (e) {
+          try {
+            capsState = 2;
+            updateCapsUI();
+            saveAll();
+          } catch (e) {}
+        }, { passive: true });
+      } catch(e){}
     }
   } catch (e) {}
 
@@ -894,7 +1012,7 @@
         const rowEl = rowsContainer.children[idx];
         if (!rowEl) return;
         const top = rowEl.offsetTop - rowsContainer.offsetTop;
-        rowsContainer.scrollTo({ top, behavior: 'smooth' });
+        smoothScrollTo(rowsContainer, top);
       } catch (e) {}
     }
     document.querySelectorAll('.jumpBtn').forEach(btn => {
