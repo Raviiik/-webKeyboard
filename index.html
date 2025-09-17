@@ -193,7 +193,7 @@
 
       /* mobile-specific rows height + touch settings */
       .rows {
-        max-height: 48vh;
+        max-height: 23vh;
         touch-action: pan-y;
         -webkit-overflow-scrolling: touch;
       }
@@ -244,7 +244,7 @@
 
     #capsBtn.caps-dim { background: #e9e9e9; border-color: #cfcfcf; }
     #capsBtn.caps-green { background: #58b16a; border-color: #3c9a4a; color: #fff; }
-    body.dark #capsBtn.caps-dim { background: #222; border-color: #444; }
+    body.dark #capsBtn.caps-dim { background: #bfbfbf; border-color: #444; }
     body.dark #capsBtn.caps-green { background: #2b7a3a; border-color: #1f5b2a; color: #fff; }
 
     #capsBtn.caps-dim img.icon-img { opacity: 0.65; transform: scale(0.98); }
@@ -273,8 +273,8 @@
   transform: translateX(-0.3px);
 }
 #spaceBtn {
-  min-width: 120px !important;
-  width: 120px !important;
+  min-width: 70px !important;
+  width: 98px !important;
 }
 #spaceBtn .icon-img {
   width: 28px !important;
@@ -288,7 +288,18 @@
 #capsBtn .icon-img {
   transform: translateX(0.6px);
 }
+.theme-toggle {
+  outline: none;          /* убираем стандартный outline */
+  box-shadow: none;       /* убираем подсветку */
+  -webkit-tap-highlight-color: transparent; /* убираем синий фон на мобильных */
+}
 
+.theme-toggle:focus,
+.theme-toggle:active {
+  outline: none;
+  box-shadow: none;
+  background-color: inherit; /* не меняем фон */
+}
   </style>
 </head>
 <body>
@@ -305,7 +316,7 @@
       <div class="controls">
 
         <div class="legend">
-          <div style="display:flex;align-items:center;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px">
             <label style="display:flex;align-items:center;gap:6px">
               <input type="checkbox" id="allowPhysical"> lock system keyboard
             </label>
@@ -344,7 +355,7 @@
 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
 
   <div class="theme-toggle" id="themeToggle">
-    <div class="thumb" id="themeThumb">☀️</div>
+    <div class="thumb" id="themeThumb">☀</div>
   </div>
 
   <button class="btn jumpBtn smallBtn" data-row="1" title="Scroll to row 5">Ѳѳ</button>
@@ -467,7 +478,7 @@
 
     // Debounce/dedupe: игнорируем повторный вызов на том же target в короткий интервал
     // (защищает от редких двойных срабатываний)
-    if (!target.__lastPointerTime) target.__lastPointerTime = 0;
+    if (!target._lastPointerTime) target._lastPointerTime = 0;
 
     function wrapper(ev) {
       try {
@@ -616,48 +627,21 @@
   let capsOn  = false;
   let darkOn  = false;
 
+  // ---------- ВОССТАНОВЛЕНИЕ applyTheme ----------
   function applyTheme() {
     try {
+      // переключаем класс темы на body и на track
       document.body.classList.toggle('dark', !!darkOn);
       if (themeToggle) themeToggle.classList.toggle('night', !!darkOn);
-      if (themeThumb) themeThumb.textContent = darkOn ? "🌙" : "☀️";
-    } catch (e) { console.error(e); }
+      if (themeThumb) themeThumb.textContent = darkOn ? "🌙" : "☀";
+    } catch (e) {
+      console.error('applyTheme error', e);
+    }
   }
 
   try {
-    let dragging = false;
-    let startX = 0;
-    if (themeThumb) {
-      addPointerListeners(themeThumb, 'down', (e) => {
-        dragging = true;
-        startX = e.clientX || 0;
-      }, { passive: true });
-    }
-
-    addPointerListeners(document, 'move', (e) => {
-      try {
-        if (!dragging || !themeThumb) return;
-        let dx = (e.clientX || 0) - startX;
-        if (!darkOn) {
-          themeThumb.style.left = Math.min(Math.max(4 + dx, 4), 56) + "px";
-        } else {
-          themeThumb.style.left = Math.min(Math.max(56 + dx, 4), 56) + "px";
-        }
-      } catch (ex) {}
-    }, { passive: true });
-
-    addPointerListeners(document, 'up', (e) => {
-      try {
-        if (!dragging) return;
-        dragging = false;
-        let dx = (e.clientX || 0) - startX;
-        if (dx > 20) darkOn = true;
-        if (dx < -20) darkOn = false;
-        applyTheme();
-        saveAll();
-        if (themeThumb) themeThumb.style.left = "";
-      } catch (ex) {}
-    }, { passive: true });
+    // Drag / snap логика для themeThumb (работает и для мыши, и для touch/pointer)
+    // ВАЖНО: эта часть была вынесена в init ниже — чтобы не мешать applyTheme
   } catch (e) {}
 
   function saveAll() {
@@ -971,53 +955,66 @@
   } catch (e) {}
 
   try {
-    if (capsBtn) {
-      capsBtn.addEventListener('click', function (e) {
-        try {
-          if (capsState === 2) {
-            capsState = 0;
-          } else if (capsState === 0) {
-            capsState = 1;
-          } else if (capsState === 1) {
-            capsState = 0;
-          }
-          updateCapsUI();
-          saveAll();
-        } catch (e) { console.error('caps click error', e); }
+    // ---------- НАДЁЖНАЯ ОБРАБОТКА CAPS ----------
+    (function setupCapsButton() {
+      if (!capsBtn) return;
+      const DOUBLE_TAP_MS = 350;
+      const LONGPRESS_MS  = 500;
+      let lastUpTime = 0;
+      let singleTapTimer = null;
+      let longpressTimer = null;
+      function clearSingle() { if (singleTapTimer) { clearTimeout(singleTapTimer); singleTapTimer = null; } }
+      function clearLong() { if (longpressTimer) { clearTimeout(longpressTimer); longpressTimer = null; } }
+      function doSingle() {
+        if (capsState === 2) {
+          capsState = 0;
+        } else if (capsState === 0) {
+          capsState = 1;
+        } else if (capsState === 1) {
+          capsState = 0;
+        }
+        updateCapsUI();
+        saveAll();
+      }
+      function doLock() {
+        capsState = 2;
+        updateCapsUI();
+        saveAll();
+      }
+      addPointerListeners(capsBtn, 'down', (ev) => {
+        clearLong();
+        longpressTimer = setTimeout(() => {
+          doLock();
+          clearSingle();
+        }, LONGPRESS_MS);
       }, { passive: true });
-
-      (function setupCapsTouchFallback(){
-        let lastTap = 0;
-        let tapCount = 0;
-        let longpressTimer = null;
-
-        addPointerListeners(capsBtn, 'down', (ev) => {
-          const now = Date.now();
-          if (now - lastTap < 350) tapCount++; else tapCount = 1;
-          lastTap = now;
-
-          clearTimeout(longpressTimer);
-          longpressTimer = setTimeout(() => {
-            capsState = 2; updateCapsUI(); saveAll(); tapCount = 0;
-          }, 500);
-        }, { passive: true });
-
-        addPointerListeners(capsBtn, 'up', (ev) => {
-          clearTimeout(longpressTimer);
-          if (tapCount === 2) { capsState = 2; updateCapsUI(); saveAll(); tapCount = 0; }
-        }, { passive: true });
-      })();
-
+      addPointerListeners(capsBtn, 'up', (ev) => {
+        clearLong();
+        const now = Date.now();
+        if (now - lastUpTime <= DOUBLE_TAP_MS) {
+          clearSingle();
+          doLock();
+          lastUpTime = 0;
+          return;
+        }
+        lastUpTime = now;
+        clearSingle();
+        singleTapTimer = setTimeout(() => {
+          doSingle();
+          singleTapTimer = null;
+          lastUpTime = 0;
+        }, Math.min(200, DOUBLE_TAP_MS));
+      }, { passive: true });
       try {
         capsBtn.addEventListener('dblclick', function (e) {
-          try {
-            capsState = 2;
-            updateCapsUI();
-            saveAll();
-          } catch (e) {}
+          e.preventDefault && e.preventDefault();
+          clearSingle();
+          clearLong();
+          doLock();
         }, { passive: true });
-      } catch(e){}
-    }
+      } catch (e) {}
+    })();
+
   } catch (e) {}
 
   try {
@@ -1056,8 +1053,133 @@
     try { render(); } catch (e2) { console.error('second render attempt failed', e2); }
   }
 
+  // ---------- ИНИЦИАЛИЗАЦИЯ DRAG (выполняется ОДИН РАЗ) ----------
+  (function initThemeDragOnce() {
+    try {
+      if (window.__themeDragInitialized) return;
+      window.__themeDragInitialized = true;
+
+      let dragging = false;
+      let startClientX = null;
+      let startLeft = null;
+      let moved = false;
+
+      function clamp(v, a, b) { return Math.min(Math.max(v, a), b); }
+
+      if (!themeThumb || !themeToggle) return;
+
+      const trackRect = () => themeToggle.getBoundingClientRect();
+      const thumbRect  = () => themeThumb.getBoundingClientRect();
+
+      addPointerListeners(themeThumb, 'down', (ev) => {
+        dragging = true;
+        moved = false;
+        startClientX = ev.clientX || 0;
+
+        const cs = getComputedStyle(themeThumb);
+        startLeft = parseFloat(cs.left);
+        if (isNaN(startLeft)) {
+          const tRect = thumbRect();
+          const tr = trackRect();
+          startLeft = darkOn ? (tr.width - tRect.width - 4) : 4;
+        }
+
+        // плавный snapp при отпускании
+        themeThumb.style.transition = 'left 0.18s ease';
+      }, { passive: true });
+
+      addPointerListeners(document, 'move', (ev) => {
+        try {
+          if (!dragging) return;
+          const clientX = ev.clientX || 0;
+          const dx = clientX - startClientX;
+          if (Math.abs(dx) > 3) moved = true;
+
+          const tr = trackRect();
+          const th = thumbRect();
+          const minLeft = 4;
+          const maxLeft = Math.max(4, tr.width - th.width - 4);
+
+          const newLeft = clamp(startLeft + dx, minLeft, maxLeft);
+          themeThumb.style.left = newLeft + 'px';
+        } catch (e) { /* ignore non-fatal */ }
+      }, { passive: true });
+
+      addPointerListeners(document, 'up', (ev) => {
+        try {
+          if (!dragging) {
+            startClientX = null;
+            startLeft = null;
+            return;
+          }
+          dragging = false;
+
+          const tr = trackRect();
+          const th = thumbRect();
+          const minLeft = 4;
+          const maxLeft = Math.max(4, tr.width - th.width - 4);
+
+          if (!moved) {
+            // короткий тап — переключаем
+            darkOn = !darkOn;
+          } else {
+            // snap по середине трека
+            const csLeft = parseFloat(getComputedStyle(themeThumb).left) || 0;
+            const mid = (minLeft + maxLeft) / 2;
+            darkOn = csLeft >= mid;
+          }
+
+          applyTheme();
+          saveAll();
+
+          // очистим inline left после небольшой задержки, чтобы позволить transition сработать
+          setTimeout(() => {
+            try { themeThumb.style.left = ''; } catch (e) {}
+          }, 40);
+        } catch (e) {
+          console.error('theme drag up error', e);
+          try { themeThumb.style.left = ''; } catch (ex) {}
+        } finally {
+          startClientX = null;
+          startLeft = null;
+          moved = false;
+        }
+      }, { passive: true });
+
+      // click: если было движение — игнор, иначе — переключаем
+      addPointerListeners(themeThumb, 'click', (ev) => {
+        if (moved) {
+          ev.preventDefault && ev.preventDefault();
+          return;
+        }
+        darkOn = !darkOn;
+        applyTheme();
+        saveAll();
+      }, { passive: true });
+
+    } catch (err) {
+      console.error('init theme drag error', err);
+    }
+  })();
+  // ---------- ТОЛЬКО КНОПКА ДЛЯ ТЕМЫ ----------
+(function initThemeToggleButton() {
+  try {
+    if (!themeToggle) return;
+
+    themeToggle.addEventListener("click", () => {
+      darkOn = !darkOn;
+      applyTheme();
+      saveAll();
+    });
+  } catch (err) {
+    console.error("theme toggle error", err);
+  }
+})();
+
 })();
 </script>
 
+</body>
+</html>
 </body>
 </html>
