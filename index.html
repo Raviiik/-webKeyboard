@@ -633,7 +633,7 @@
       // переключаем класс темы на body и на track
       document.body.classList.toggle('dark', !!darkOn);
       if (themeToggle) themeToggle.classList.toggle('night', !!darkOn);
-      if (themeThumb) themeThumb.textContent = darkOn ? "🌙" : "☀";
+      if (themeThumb) themeThumb.textContent = darkOn ? "🌙" : "☀️";
     } catch (e) {
       console.error('applyTheme error', e);
     }
