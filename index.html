@@ -288,6 +288,19 @@
 #capsBtn .icon-img {
   transform: translateX(0.6px);
 }
+    .theme-toggle {
+  outline: none;          
+  box-shadow: none;       
+  -webkit-tap-highlight-color: transparent; 
+}
+
+.theme-toggle:focus,
+.theme-toggle:active {
+  outline: none;
+  box-shadow: none;
+  background-color: inherit; 
+}
+
 
   </style>
 </head>
@@ -1150,6 +1163,20 @@
       console.error('init theme drag error', err);
     }
   })();
+
+(function initThemeToggleButton() {
+  try {
+    if (!themeToggle) return;
+
+    themeToggle.addEventListener("click", () => {
+      darkOn = !darkOn;
+      applyTheme();
+      saveAll();
+    });
+  } catch (err) {
+    console.error("theme toggle error", err);
+  }
+})();
 
 })();
 </script>
