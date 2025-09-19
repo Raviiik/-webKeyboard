@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Sanscrit_Keybard — fixed</title>
   <style>
-}
 @font-face {
   font-family: 'Andika';
   src: url('./Andika-Regular.ttf') format('truetype');
@@ -181,18 +180,18 @@ html, body { font-family: 'Andika', system-ui, -apple-system, 'Segoe UI', Roboto
       align-items: center;
       justify-content: center;
     }
-      @media (max-width: 900px) {
-  .key[data-value="-"],
-  .key[data-value="~"] {
-    font-family: monospace, 'Courier New', Courier, sans-serif !important;
-    font-size: 22px !important;
-    letter-spacing: 0.25em !important;  /* увеличить расстояние */
-    padding-left: 3px !important;
-    padding-right: 3px !important;
-    background: #fff;  /* чтобы видеть края */
-  }
 
-}
+    @media (max-width: 900px) {
+      .app { flex-direction: column; padding: 10px; gap: 10px; }
+      .keyboard {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        width: auto;
+        border-radius: 14px 14px 0 0;
+        z-index: 9999;
+        box-shadow: 0 -2px 18px rgba(20,30,50,0.18);
+        max-height: 48vh;
+      }
 
       /* mobile-specific rows height + touch settings */
       .rows {
