@@ -191,6 +191,14 @@ html, body { font-family: 'Andika', system-ui, -apple-system, 'Segoe UI', Roboto
         z-index: 9999;
         box-shadow: 0 -2px 18px rgba(20,30,50,0.18);
         max-height: 48vh;
+        .key[data-value="-"],
+        .key[data-value="~"] {
+        font-family: monospace, 'Courier New', Courier, sans-serif !important;
+        font-size: 22px !important;
+        letter-spacing: 0.25em !important;
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+        background: #fff;
       }
 
       /* mobile-specific rows height + touch settings */
@@ -712,9 +720,11 @@ html, body { font-family: 'Andika', system-ui, -apple-system, 'Segoe UI', Roboto
     return out;
   }
 
-  function displayTextForKey(originalVal) {
-    return applyCaps(originalVal);
-  }
+function displayTextForKey(originalVal) {
+  if (originalVal === '-') return '\u2212'; // математический минус
+  if (originalVal === '~') return '\u223C'; // волнистая тильда
+  return applyCaps(originalVal);
+}
 
   function setSelectionSafe(ta, start, end){
     try { if (typeof ta.focus === 'function') ta.focus(); } catch(e){}
