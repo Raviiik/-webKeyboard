@@ -580,17 +580,17 @@ html, body { font-family: 'Andika', system-ui, -apple-system, 'Segoe UI', Roboto
   ]);
 
   function applyCaps(text) {
-    if (!text) return text;
-    if (!capsOn) return text;
-    let res = String(text).normalize('NFC');
-    const entries = Array.from(CAPS_MAP.entries()).sort((a, b) => b[0].length - a[0].length);
-    for (const [k, v] of entries) {
-      if (!k) continue;
-      if (res.indexOf(k) === -1) continue;
-      res = res.split(k).join(v);
-    }
-    return res;
+  if (!text) return text;
+  if (!capsOn) return text;
+  let res = String(text).normalize('NFC');
+  const entries = Array.from(CAPS_MAP.entries()).sort((a, b) => b[0].length - a[0].length);
+  for (const [k, v] of entries) {
+    if (!k) continue;
+    if (res.indexOf(k) === -1) continue;
+    res = res.split(k).join(v);
   }
+  return res;
+}
 
   const STORAGE_ALLOW = 'webkbd_allow_v5';
   const STORAGE_COLS  = 'webkbd_cols_v3';
@@ -631,7 +631,7 @@ html, body { font-family: 'Andika', system-ui, -apple-system, 'Segoe UI', Roboto
   let capsOn  = false;
   let darkOn  = false;
 
-  // ---------- ВОССТАНОВЛЕНИЕ applyTheme ----------
+ 
   function applyTheme() {
     try {
       // переключаем класс темы на body и на track
@@ -710,13 +710,6 @@ html, body { font-family: 'Andika', system-ui, -apple-system, 'Segoe UI', Roboto
       console.error('buildRows error', e);
     }
     return out;
-  }
-
-  function applyCaps(text) {
-    if (!capsOn || !text) return text;
-    let res = '';
-    for (const ch of text) res += CAPS_MAP.get(ch) || ch;
-    return res;
   }
 
   function displayTextForKey(originalVal) {
