@@ -5,14 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Sanscrit_Keybard — fixed</title>
   <style>
-@font-face {
-  font-family: 'Andika';
-  src: url('./Andika-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-html, body { font-family: 'Andika', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+    @font-face {
+      font-family: 'Andika';
+      src: url('./fonts/Andika-Regular.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
 
     :root {
       --kbd-width: 360px;
@@ -191,14 +189,6 @@ html, body { font-family: 'Andika', system-ui, -apple-system, 'Segoe UI', Roboto
         z-index: 9999;
         box-shadow: 0 -2px 18px rgba(20,30,50,0.18);
         max-height: 48vh;
-        .key[data-value="-"],
-        .key[data-value="~"] {
-        font-family: monospace, 'Courier New', Courier, sans-serif !important;
-        font-size: 22px !important;
-        letter-spacing: 0.25em !important;
-        padding-left: 4px !important;
-        padding-right: 4px !important;
-        background: #fff;
       }
 
       /* mobile-specific rows height + touch settings */
@@ -570,13 +560,13 @@ html, body { font-family: 'Andika', system-ui, -apple-system, 'Segoe UI', Roboto
 
   const CAPS_MAP = new Map([
     ['а','А'], ['ā','Ā'], ['и','И'], ['ӣ','Ӣ'], ['у','У'], ['ӯ','Ӯ'],
-    ['рь','РЬ'], ['рь̄ ','Рь̄ '], ['љ','Љ'], ['љ̄ ','Љ̄ '],
+    ['рь','РЬ'], ['рь̄ ','РЬ̄ '], ['љ','Љ'], ['љ̄','Љ̄'],
     ['ԑ','Ԑ'], ['о','О'], ['⦂','⦂'], ['ә','Ә'], ['ɔ','Ɔ'], ['ᵒ','ᵒ'],
-    ['к','К'], ['к᷉ ','К᷉ '], ['г','Г'], ['г᷉ ','Г᷉ '], ['ӈ','Ӈ'],
-    ['ч','Ч'], ['ч᷉ ','Ч᷉ '], ['џ','Џ'], ['џ᷉ ','Џ᷉ '], ['њ','Њ'],
-    ['ԏ','Ԏ'], ['ԏ᷉ ','Ԏ᷉ '], ['ԃ','Ԃ'], ['ԃ᷉ ','Ԃ᷉ '], ['ԋ','Ԋ'],
-    ['т','Т'], ['т᷉ ','Т᷉ '], ['д','Д'], ['д᷉ ','Д᷉ '], ['н','Н'],
-    ['п','П'], ['п᷉ ','П᷉ '], ['б','Б'], ['б᷉ ','Б᷉ '], ['м','М'],
+    ['к','К'], ['к᷉','К᷉'], ['г','Г'], ['г᷉','Г᷉'], ['ӈ','Ӈ'],
+    ['ч','Ч'], ['ч᷉','Ч᷉'], ['џ','Џ'], ['џ᷉','Џ᷉'], ['њ','Њ'],
+    ['ԏ','Ԏ'], ['ԏ᷉','Ԏ᷉'], ['ԃ','Ԃ'], ['ԃ᷉','Ԃ᷉'], ['ԋ','Ԋ'],
+    ['т','Т'], ['т᷉','Т᷉'], ['д','Д'], ['д᷉','Д᷉'], ['н','Н'],
+    ['п','П'], ['п᷉','П᷉'], ['б','Б'], ['б᷉','Б᷉'], ['м','М'],
     ['й','Й'], ['р','Р'], ['л','Л'], ['в','В'],
     ['щ','Щ'], ['ш','Ш'], ['с','С'], ['х','Х'], ['ԉ','Ԉ'],
     ['а','А'], ['б','Б'], ['в','В'], ['г','Г'], ['д','Д'], ['е','Е'], ['ё','Ё'],
@@ -588,17 +578,17 @@ html, body { font-family: 'Andika', system-ui, -apple-system, 'Segoe UI', Roboto
   ]);
 
   function applyCaps(text) {
-  if (!text) return text;
-  if (!capsOn) return text;
-  let res = String(text).normalize('NFC');
-  const entries = Array.from(CAPS_MAP.entries()).sort((a, b) => b[0].length - a[0].length);
-  for (const [k, v] of entries) {
-    if (!k) continue;
-    if (res.indexOf(k) === -1) continue;
-    res = res.split(k).join(v);
+    if (!text) return text;
+    if (!capsOn) return text;
+    let res = String(text).normalize('NFC');
+    const entries = Array.from(CAPS_MAP.entries()).sort((a, b) => b[0].length - a[0].length);
+    for (const [k, v] of entries) {
+      if (!k) continue;
+      if (res.indexOf(k) === -1) continue;
+      res = res.split(k).join(v);
+    }
+    return res;
   }
-  return res;
-}
 
   const STORAGE_ALLOW = 'webkbd_allow_v5';
   const STORAGE_COLS  = 'webkbd_cols_v3';
@@ -639,7 +629,7 @@ html, body { font-family: 'Andika', system-ui, -apple-system, 'Segoe UI', Roboto
   let capsOn  = false;
   let darkOn  = false;
 
- 
+  // ---------- ВОССТАНОВЛЕНИЕ applyTheme ----------
   function applyTheme() {
     try {
       // переключаем класс темы на body и на track
@@ -720,11 +710,16 @@ html, body { font-family: 'Andika', system-ui, -apple-system, 'Segoe UI', Roboto
     return out;
   }
 
-function displayTextForKey(originalVal) {
-  if (originalVal === '-') return '\u2212'; // математический минус
-  if (originalVal === '~') return '\u223C'; // волнистая тильда
-  return applyCaps(originalVal);
-}
+  function applyCaps(text) {
+    if (!capsOn || !text) return text;
+    let res = '';
+    for (const ch of text) res += CAPS_MAP.get(ch) || ch;
+    return res;
+  }
+
+  function displayTextForKey(originalVal) {
+    return applyCaps(originalVal);
+  }
 
   function setSelectionSafe(ta, start, end){
     try { if (typeof ta.focus === 'function') ta.focus(); } catch(e){}
@@ -746,61 +741,70 @@ function displayTextForKey(originalVal) {
   }
 
   function render() {
-    try {
-      if (!rowsContainer) {
-        console.warn('rowsContainer is missing in render(), attempting to recreate.');
-        rowsContainer = document.getElementById('rowsContainer');
-        if (!rowsContainer && keyboardEl) {
-          rowsContainer = document.createElement('div');
-          rowsContainer.id = 'rowsContainer';
-          rowsContainer.className = 'rows';
-          keyboardEl.appendChild(rowsContainer);
-        }
-        if (!rowsContainer) return;
+  try {
+    if (!rowsContainer) {
+      console.warn('rowsContainer is missing in render(), attempting to recreate.');
+      rowsContainer = document.getElementById('rowsContainer');
+      if (!rowsContainer && keyboardEl) {
+        rowsContainer = document.createElement('div');
+        rowsContainer.id = 'rowsContainer';
+        rowsContainer.className = 'rows';
+        keyboardEl.appendChild(rowsContainer);
       }
-
-      while (rowsContainer.firstChild) rowsContainer.removeChild(rowsContainer.firstChild);
-
-      const rows = buildRows(KEYS_DEF, maxCols);
-      rows.forEach((rowArr, rowIndex) => {
-        try {
-          const rowEl = document.createElement('div');
-          rowEl.className = 'row';
-          rowEl.style.gridTemplateColumns = 'repeat(' + maxCols + ', 1fr)';
-
-          if (!Array.isArray(rowArr) || rowArr.length === 0) {
-            const emptyBtn = document.createElement('div');
-            emptyBtn.className = 'key empty';
-            rowEl.appendChild(emptyBtn);
-          } else {
-            rowArr.forEach(val => {
-              const btn = document.createElement('button');
-              btn.type = 'button';
-              btn.className = 'key';
-              btn.textContent = displayTextForKey(val);
-              btn.dataset.value = val;
-
-              // use native click to avoid double events on touch devices and not block scroll
-              btn.addEventListener('click', function (ev) {
-                try {
-                  insertAtCursor(val);
-                } catch (e) { console.error('insertAtCursor failed', e); }
-              }, { passive: true });
-
-              rowEl.appendChild(btn);
-            });
-          }
-          rowsContainer.appendChild(rowEl);
-        } catch (eRow) {
-          console.error('Ошибка рендера строки', rowIndex, eRow);
-        }
-      });
-
-      updateBottomPadding();
-    } catch (e) {
-      console.error('render fatal error', e);
+      if (!rowsContainer) return;
     }
+
+    // очистим контейнер
+    while (rowsContainer.firstChild) rowsContainer.removeChild(rowsContainer.firstChild);
+
+    // соберём строки с учётом maxCols
+    const rows = buildRows(KEYS_DEF, maxCols);
+    rows.forEach((rowArr, rowIndex) => {
+      try {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'row';
+        rowEl.style.gridTemplateColumns = 'repeat(' + maxCols + ', 1fr)';
+
+        if (!Array.isArray(rowArr) || rowArr.length === 0) {
+          const emptyBtn = document.createElement('div');
+          emptyBtn.className = 'key empty';
+          rowEl.appendChild(emptyBtn);
+        } else {
+          rowArr.forEach(val => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'key';
+
+            // Нормализуем ключи и убираем случайные пробелы по краям
+            const rawVal = String(val || '').normalize('NFC');
+            const storedVal = rawVal.trim();
+
+            // Сохраняем "чистое" значение и отображаем текст с учётом caps
+            btn.dataset.value = storedVal;
+            btn.textContent = displayTextForKey(storedVal);
+
+            // use native click to avoid double events on touch devices and not block scroll
+            btn.addEventListener('click', function (ev) {
+              try {
+                insertAtCursor(storedVal);
+              } catch (e) { console.error('insertAtCursor failed', e); }
+            }, { passive: true });
+
+            rowEl.appendChild(btn);
+          });
+        }
+        rowsContainer.appendChild(rowEl);
+      } catch (eRow) {
+        console.error('Ошибка рендера строки', rowIndex, eRow);
+      }
+    });
+
+    updateBottomPadding();
+  } catch (e) {
+    console.error('render fatal error', e);
   }
+}
+
 
   window.safeRender = function () {
     try { render(); } catch (e) { console.error('safeRender error', e); }
