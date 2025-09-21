@@ -5,12 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Sanscrit_Keybard — fixed</title>
   <style>
-    @font-face {
-      font-family: 'Andika';
-      src: url('./fonts/Andika-Regular.ttf') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
+   @font-face {
+  font-family: "Andika";
+  src: url("./fonts/Andika-Regular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* теперь используем шрифт */
+body {
+  font-family: "Andika", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
 
     :root {
       --kbd-width: 360px;
