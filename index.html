@@ -532,50 +532,41 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
   function addPointerListeners(target, type, handler, options) {
     options = options || {};
 
-
+    // Выберем подходящую стратегию в зависимости от возможностей платформы
     const supportsPointer = typeof window.PointerEvent !== 'undefined';
     const supportsTouch = 'ontouchstart' in window;
 
     const map = (function() {
+      // Важно: для быстрого отклика заменяем 'click' на эквивалент DOWN-события
       if (supportsPointer) {
         return {
           down: ['pointerdown'],
           move: ['pointermove'],
           up:   ['pointerup','pointercancel'],
-          click:['click'] 
+          click:['pointerdown'] // мгновенный отклик на pointerdown
         };
       } else if (supportsTouch) {
         return {
           down: ['touchstart'],
           move: ['touchmove'],
           up:   ['touchend','touchcancel'],
-          click:['click','touchend']
+          click:['touchstart'] // мгновенный отклик на touchstart
         };
       } else {
         return {
           down: ['mousedown'],
           move: ['mousemove'],
           up:   ['mouseup'],
-          click:['click']
+          click:['mousedown'] // мгновенный отклик на mousedown
         };
       }
     })();
 
     const evNames = map[type] || [type];
 
-     
-    
-    if (!target.__lastPointerTime) target.__lastPointerTime = 0;
-
     function wrapper(ev) {
       try {
-        const now = Date.now();
-        if (now - target.__lastPointerTime < 40) {
-          return;
-        }
-        target.__lastPointerTime = now;
-
-        
+        // Обработаем touch как раньше — берем первый touch
         if (ev && ev.type && ev.type.indexOf('touch') === 0 && ev.changedTouches && ev.changedTouches.length) {
           const t = ev.changedTouches[0];
           const synth = {
@@ -603,7 +594,6 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
       }
     });
   }
-
 
   const KEYS_DEF = [
     ['а','ā','и','ӣ','у','ӯ'],
@@ -1156,13 +1146,11 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
     const settingsPopup = document.getElementById('settingsPopup');
     const langSelect = document.getElementById('langSelect');
 
-
     settingsBtn && settingsBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       settingsPopup.classList.toggle('hidden');
       settingsPopup.setAttribute('aria-hidden', settingsPopup.classList.contains('hidden') ? 'true' : 'false');
     });
-
 
     document.addEventListener('click', (e) => {
       if (!settingsPopup || !settingsBtn) return;
@@ -1226,3 +1214,4 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
 
 </body>
 </html>
+
