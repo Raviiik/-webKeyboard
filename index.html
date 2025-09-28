@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Sanscrit_Keybard — fixed</title>
+  <title>Sanskrit_Keybard</title>
   <style>
    @font-face {
   font-family: "Andika";
@@ -429,9 +429,9 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
 <div id="settingsPopup" class="hidden" role="dialog" aria-hidden="true" aria-label="Настройки клавиатуры">
   <h4>Язык раскладки</h4>
   <select id="langSelect" aria-label="Выбор языка">
-    <option value="default">Default (original)</option>
-    <option value="ru">Русский (простая раскладка)</option>
-    <option value="en">English (QWERTY)</option>
+    <option value="default">Default</option>
+    <option value="ru">Русская раскладка </option>
+    <option value="en">English</option>
     <option value="sa">Sanscrit / Devanagari</option>
   </select>
 
@@ -658,6 +658,9 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
     ['у','У'], ['ф','Ф'], ['ѳ','Ѳ'], ['х','Х'], ['ц','Ц'], ['ч','Ч'], ['ш','Ш'],
     ['щ','Щ'], ['ъ','Ъ'], ['ы','Ы'], ['ь','Ь'], ['э','Э'], ['ю','Ю'], ['я','Я'],
     ['ѣ','Ѣ'],
+    ['a','A'], ['b','B'], ['c','C'], ['d','D'], ['e','E'], ['f','F'], ['g','G'], ['h','H'], ['i','I'], ['j','J'],
+    ['k','K'], ['l','L'], ['m','M'], ['n','N'], ['o','O'], ['p','P'], ['q','Q'], ['r','R'], ['s','S'], ['t','T'],
+    ['u','U'], ['v','V'], ['w','W'], ['x','X'], ['y','Y'], ['z','Z']
   ]);
 
   function applyCaps(text) {
@@ -1180,9 +1183,9 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
         ];
       } else if (key === 'en') {
         currentLayout = [
-          ['q','w','e','r','t','y','u','i','o','p'],
-          ['a','s','d','f','g','h','j','k','l'],
-          ['z','x','c','v','b','n','m']
+          ['a','b','c','d','e','f','g','h','i','j'],
+          ['k','l','m','n','o','p','q','r','s','t'],
+          ['u','v','w','x','y','z']
         ];
       } else if (key === 'sa') {
         currentLayout = [
