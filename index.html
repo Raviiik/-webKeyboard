@@ -13,7 +13,6 @@
   font-display: swap;
 }
 
-
 body {
   font-family: "Andika", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
@@ -64,6 +63,7 @@ body {
       border-radius: 12px;
       padding: 10px;
       box-shadow: 0 6px 18px rgba(20,30,50,0.06);
+      position: relative; /* для абсолютной всплывашки */
     }
 
     .controls { display: flex; flex-direction: column; gap: 8px; }
@@ -74,7 +74,7 @@ body {
     .status { font-size: 13px; color: inherit; }
     .small { font-size: 12px; opacity: .85; }
 
-    
+
     .rows {
       display: flex;
       flex-direction: column;
@@ -198,7 +198,7 @@ body {
         max-height: 48vh;
       }
 
-      
+
       .rows {
         max-height: 23vh;
         touch-action: pan-y;
@@ -262,6 +262,19 @@ body {
       .icon-btn img.icon-img, .icon-btn svg.icon-fallback { max-width: 18px; max-height: 18px; }
     }
 
+
+#settingsBtn .icon-img {
+  width: 37px !important;
+  height: 45px !important;
+  max-width: none !important;
+  max-height: none !important;
+  display: block;
+  object-fit: contain;
+    object-fit: contain;
+  transform: translateY(2.7px);
+   transform: translateX(-1.px);
+}
+
 #copyBtn .icon-img {
   width: 21px !important;
   height: 28px !important;
@@ -309,6 +322,47 @@ body {
 }
 
 
+#settingsPopup {
+  position: absolute;
+  top: 52px;
+  left: 10px;
+  background: #fff;
+  color: #111;
+  border: 1px solid #ddd;
+  padding: 8px;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(10,20,40,0.12);
+  z-index: 999;
+  min-width: 180px;
+  max-width: 320px;
+}
+#settingsPopup.hidden { display: none; }
+#settingsPopup h4 { margin: 6px 0 6px 0; font-size: 13px; }
+#settingsPopup select {
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 13px;
+}
+#settingsPopup .note { font-size: 12px; opacity: .8; margin-top:4px; }
+
+
+@media (max-width: 420px) {
+  #settingsPopup {
+    left: 12px;
+    right: 12px;
+    top: 54px;
+    min-width: unset;
+    width: calc(100% - 24px);
+    padding: 8px;
+    border-radius: 12px;
+  }
+}
+
+body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222; }
   </style>
 </head>
 <body>
@@ -329,6 +383,16 @@ body {
             <label style="display:flex;align-items:center;gap:6px">
               <input type="checkbox" id="allowPhysical"> lock system keyboard
             </label>
+
+           
+            <button class="btn icon-btn" id="settingsBtn" title="Настройки" aria-label="Настройки">
+              <img class="icon-img" src="./settings.svg" alt="settings" decoding="async" draggable="false"
+                   onload="this.style.display='inline-block';" onerror="this.style.display='none'">
+              <svg class="icon-fallback" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06c.46-.46.6-1.15.33-1.82a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09c.7 0 1.31-.39 1.51-1a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06c.46.46 1.15.6 1.82.33h.09c.61-.2 1-.81 1-1.51V3a2 2 0 014 0v.09c0 .7.39 1.31 1 1.51h.09c.67.27 1.36.13 1.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06c-.46.46-.6 1.15-.33 1.82v.09c.2.61.81 1 1.51 1H21a2 2 0 010 4h-.09c-.7 0-1.31.39-1.51 1z"/>
+              </svg>
+            </button>
 
             <button class="btn icon-btn" id="copyBtn" title="Copy all" aria-label="Copy all">
               <img class="icon-img" src="./copy.svg" alt="copy" decoding="async" draggable="false"
@@ -360,6 +424,20 @@ body {
             </button>
 
           </div>
+
+
+<div id="settingsPopup" class="hidden" role="dialog" aria-hidden="true" aria-label="Настройки клавиатуры">
+  <h4>Язык раскладки</h4>
+  <select id="langSelect" aria-label="Выбор языка">
+    <option value="default">Default (original)</option>
+    <option value="ru">Русский (простая раскладка)</option>
+    <option value="en">English (QWERTY)</option>
+    <option value="sa">Sanscrit / Devanagari</option>
+  </select>
+
+<div class="note" style="margin-top:6px">Настройки сохраняются в localStorage.</div>
+</div>
+
 
 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
 
@@ -454,7 +532,7 @@ body {
   function addPointerListeners(target, type, handler, options) {
     options = options || {};
 
-    // Выберем подходящую стратегию в зависимости от возможностей платформы
+
     const supportsPointer = typeof window.PointerEvent !== 'undefined';
     const supportsTouch = 'ontouchstart' in window;
 
@@ -464,7 +542,7 @@ body {
           down: ['pointerdown'],
           move: ['pointermove'],
           up:   ['pointerup','pointercancel'],
-          click:['click'] // use click for activation
+          click:['click'] 
         };
       } else if (supportsTouch) {
         return {
@@ -525,6 +603,7 @@ body {
       }
     });
   }
+
 
   const KEYS_DEF = [
     ['а','ā','и','ӣ','у','ӯ'],
@@ -598,6 +677,8 @@ body {
   const STORAGE_COLS  = 'webkbd_cols_v3';
   const STORAGE_CAPS  = 'webkbd_caps_v2';
   const STORAGE_THEME = 'webkbd_theme_v1';
+  const STORAGE_FONT  = 'webkbd_font_v1';
+  const STORAGE_LANG  = 'webkbd_lang_v1';
 
   const keyboardEl     = document.getElementById('keyboard') || document.querySelector('.keyboard') || document.body;
   const allowPhysical  = document.getElementById('allowPhysical');
@@ -633,6 +714,8 @@ body {
   let capsOn  = false;
   let darkOn  = false;
 
+  let currentLayout = null;
+
 
   function applyTheme() {
     try {
@@ -643,9 +726,6 @@ body {
       console.error('applyTheme error', e);
     }
   }
-
-  try {
-  } catch (e) {}
 
   function saveAll() {
     try {
@@ -711,13 +791,6 @@ body {
     return out;
   }
 
-  function applyCaps(text) {
-    if (!capsOn || !text) return text;
-    let res = '';
-    for (const ch of text) res += CAPS_MAP.get(ch) || ch;
-    return res;
-  }
-
   function displayTextForKey(originalVal) {
     return applyCaps(originalVal);
   }
@@ -758,7 +831,7 @@ body {
     while (rowsContainer.firstChild) rowsContainer.removeChild(rowsContainer.firstChild);
 
 
-    const rows = buildRows(KEYS_DEF, maxCols);
+    const rows = buildRows(currentLayout || KEYS_DEF, maxCols);
     rows.forEach((rowArr, rowIndex) => {
       try {
         const rowEl = document.createElement('div');
@@ -775,16 +848,13 @@ body {
             btn.type = 'button';
             btn.className = 'key';
 
-            // Нормализуем ключи и убираем случайные пробелы по краям
             const rawVal = String(val || '').normalize('NFC');
             const storedVal = rawVal.trim();
 
-            // Сохраняем "чистое" значение и отображаем текст с учётом caps
             btn.dataset.value = storedVal;
             btn.textContent = displayTextForKey(storedVal);
 
-            // use native click to avoid double events on touch devices and not block scroll
-            btn.addEventListener('click', function (ev) {
+            addPointerListeners(btn, 'click', function (ev) {
               try {
                 insertAtCursor(storedVal);
               } catch (e) { console.error('insertAtCursor failed', e); }
@@ -966,7 +1036,6 @@ body {
   } catch (e) {}
 
   try {
-    // ---------- НАДЁЖНАЯ ОБРАБОТКА CAPS ----------
     (function setupCapsButton() {
       if (!capsBtn) return;
       const DOUBLE_TAP_MS = 350;
@@ -1064,115 +1133,6 @@ body {
     try { render(); } catch (e2) { console.error('second render attempt failed', e2); }
   }
 
-  // ---------- ИНИЦИАЛИЗАЦИЯ DRAG (выполняется ОДИН РАЗ) ----------
-  (function initThemeDragOnce() {
-    try {
-      if (window.__themeDragInitialized) return;
-      window.__themeDragInitialized = true;
-
-      let dragging = false;
-      let startClientX = null;
-      let startLeft = null;
-      let moved = false;
-
-      function clamp(v, a, b) { return Math.min(Math.max(v, a), b); }
-
-      if (!themeThumb || !themeToggle) return;
-
-      const trackRect = () => themeToggle.getBoundingClientRect();
-      const thumbRect  = () => themeThumb.getBoundingClientRect();
-
-      addPointerListeners(themeThumb, 'down', (ev) => {
-        dragging = true;
-        moved = false;
-        startClientX = ev.clientX || 0;
-
-        const cs = getComputedStyle(themeThumb);
-        startLeft = parseFloat(cs.left);
-        if (isNaN(startLeft)) {
-          const tRect = thumbRect();
-          const tr = trackRect();
-          startLeft = darkOn ? (tr.width - tRect.width - 4) : 4;
-        }
-
-        // плавный snapp при отпускании
-        themeThumb.style.transition = 'left 0.18s ease';
-      }, { passive: true });
-
-      addPointerListeners(document, 'move', (ev) => {
-        try {
-          if (!dragging) return;
-          const clientX = ev.clientX || 0;
-          const dx = clientX - startClientX;
-          if (Math.abs(dx) > 3) moved = true;
-
-          const tr = trackRect();
-          const th = thumbRect();
-          const minLeft = 4;
-          const maxLeft = Math.max(4, tr.width - th.width - 4);
-
-          const newLeft = clamp(startLeft + dx, minLeft, maxLeft);
-          themeThumb.style.left = newLeft + 'px';
-        } catch (e) { /* ignore non-fatal */ }
-      }, { passive: true });
-
-      addPointerListeners(document, 'up', (ev) => {
-        try {
-          if (!dragging) {
-            startClientX = null;
-            startLeft = null;
-            return;
-          }
-          dragging = false;
-
-          const tr = trackRect();
-          const th = thumbRect();
-          const minLeft = 4;
-          const maxLeft = Math.max(4, tr.width - th.width - 4);
-
-          if (!moved) {
-            // короткий тап — переключаем
-            darkOn = !darkOn;
-          } else {
-            // snap по середине трека
-            const csLeft = parseFloat(getComputedStyle(themeThumb).left) || 0;
-            const mid = (minLeft + maxLeft) / 2;
-            darkOn = csLeft >= mid;
-          }
-
-          applyTheme();
-          saveAll();
-
-          // очистим inline left после небольшой задержки, чтобы позволить transition сработать
-          setTimeout(() => {
-            try { themeThumb.style.left = ''; } catch (e) {}
-          }, 40);
-        } catch (e) {
-          console.error('theme drag up error', e);
-          try { themeThumb.style.left = ''; } catch (ex) {}
-        } finally {
-          startClientX = null;
-          startLeft = null;
-          moved = false;
-        }
-      }, { passive: true });
-
-      // click: если было движение — игнор, иначе — переключаем
-      addPointerListeners(themeThumb, 'click', (ev) => {
-        if (moved) {
-          ev.preventDefault && ev.preventDefault();
-          return;
-        }
-        darkOn = !darkOn;
-        applyTheme();
-        saveAll();
-      }, { passive: true });
-
-    } catch (err) {
-      console.error('init theme drag error', err);
-    }
-  })();
-
 (function initThemeToggleButton() {
   try {
     if (!themeToggle) return;
@@ -1187,9 +1147,79 @@ body {
   }
 })();
 
+(function initSettings() {
+  try {
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsPopup = document.getElementById('settingsPopup');
+    const langSelect = document.getElementById('langSelect');
+
+
+    settingsBtn && settingsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      settingsPopup.classList.toggle('hidden');
+      settingsPopup.setAttribute('aria-hidden', settingsPopup.classList.contains('hidden') ? 'true' : 'false');
+    });
+
+
+    document.addEventListener('click', (e) => {
+      if (!settingsPopup || !settingsBtn) return;
+      if (!settingsPopup.contains(e.target) && !settingsBtn.contains(e.target)) {
+        settingsPopup.classList.add('hidden');
+        settingsPopup.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    function setLayoutByKey(key) {
+      if (key === 'default') {
+        currentLayout = null;
+      } else if (key === 'ru') {
+        currentLayout = [
+          ['й','ц','у','к','е','н','г','ш','щ','з','х','ъ'],
+          ['ф','ы','в','а','п','р','о','л','д','ж','э'],
+          ['я','ч','с','м','и','т','ь','б','ю','.']
+        ];
+      } else if (key === 'en') {
+        currentLayout = [
+          ['q','w','e','r','t','y','u','i','o','p'],
+          ['a','s','d','f','g','h','j','k','l'],
+          ['z','x','c','v','b','n','m']
+        ];
+      } else if (key === 'sa') {
+        currentLayout = [
+          ['अ','आ','इ','ई','उ','ऊ','ऋ'],
+          ['क','ख','ग','घ','ङ','च','छ','ज','झ','ञ'],
+          ['त','थ','द','ध','न','प','फ','ब','भ','म']
+        ];
+      } else {
+        currentLayout = null;
+      }
+      render();
+      localStorage.setItem(STORAGE_LANG, key);
+    }
+
+    langSelect.addEventListener('change', (e) => {
+      setLayoutByKey(e.target.value);
+    });
+
+    (function restoreSettings() {
+      try {
+        const savedLang = localStorage.getItem(STORAGE_LANG);
+        if (savedLang) {
+          langSelect.value = savedLang;
+          setLayoutByKey(savedLang);
+        } else {
+
+        }
+      } catch (e) {}
+    })();
+
+  } catch (err) {
+    console.error('initSettings error', err);
+  }
+})();
+
 })();
 </script>
 
 </body>
-</html>
 </html>
