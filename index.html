@@ -12,6 +12,13 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: 'SanskritFont';
+  src: url('fonts/L_Shobhika-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 
 body {
   font-family: "Andika", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -31,7 +38,7 @@ body {
       background: #f5f7fa;
       color: #111;
     }
-    * { font-family: 'Andika' }
+    * { font-family: 'Andika','SanskritFont' }
 
     .app { display: flex; height: 100vh; gap: 12px; padding: 12px; box-sizing: border-box; }
     .editor { flex: 1; display: flex; flex-direction: column; }
@@ -363,6 +370,14 @@ body {
 }
 
 body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222; }
+  
+  .sa .key {
+  font-family: 'SanskritFont', sans-serif !important;
+}
+
+
+
+
   </style>
 </head>
 <body>
@@ -429,8 +444,7 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
 <div id="settingsPopup" class="hidden" role="dialog" aria-hidden="true" aria-label="Настройки клавиатуры">
   <h4>Язык раскладки</h4>
   <select id="langSelect" aria-label="Выбор языка">
-    <option value="default">Default</option>
-    <option value="ru">Русская раскладка </option>
+    <option value="default">Кириллица</option>
     <option value="en">English</option>
     <option value="sa">Sanscrit / Devanagari</option>
   </select>
@@ -532,32 +546,32 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
   function addPointerListeners(target, type, handler, options) {
     options = options || {};
 
-    // Выберем подходящую стратегию в зависимости от возможностей платформы
+
     const supportsPointer = typeof window.PointerEvent !== 'undefined';
     const supportsTouch = 'ontouchstart' in window;
 
     const map = (function() {
-      // Важно: для быстрого отклика заменяем 'click' на эквивалент DOWN-события
+
       if (supportsPointer) {
         return {
           down: ['pointerdown'],
           move: ['pointermove'],
           up:   ['pointerup','pointercancel'],
-          click:['pointerdown'] // мгновенный отклик на pointerdown
+          click:['pointerdown'] 
         };
       } else if (supportsTouch) {
         return {
           down: ['touchstart'],
           move: ['touchmove'],
           up:   ['touchend','touchcancel'],
-          click:['touchstart'] // мгновенный отклик на touchstart
+          click:['touchstart'] 
         };
       } else {
         return {
           down: ['mousedown'],
           move: ['mousemove'],
           up:   ['mouseup'],
-          click:['mousedown'] // мгновенный отклик на mousedown
+          click:['mousedown'] 
         };
       }
     })();
@@ -566,7 +580,6 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
 
     function wrapper(ev) {
       try {
-        // Обработаем touch как раньше — берем первый touch
         if (ev && ev.type && ev.type.indexOf('touch') === 0 && ev.changedTouches && ev.changedTouches.length) {
           const t = ev.changedTouches[0];
           const synth = {
@@ -623,12 +636,15 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
     ['1','2','3','4','5','6'],
     ['7','8','9','0'],
 
-    ['➀','➁','➂','➃','➄','➅'],
-    ['➆','`','°','√','*','^'],
-    ['+','=','≠','≥','±'],
-    ['~','≈','|','/'],
-    ['[',']','{','}','<','>'],
-    ['←','→','↓','↑','↙','↗']
+
+  ['➀','➁','➂','➃','➄','➅'],
+  ['➆', '❕', '`','°','√','*'],
+  ['^','+','=','≠','≥','±'],
+  ['~','≈','|','/'],
+  ['[',']','{','}','<','>'],
+  ['←','→','↓','↑','↙','↗']
+
+
   ];
 
   const CAPS_MAP = new Map([
@@ -847,11 +863,61 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
             btn.dataset.value = storedVal;
             btn.textContent = displayTextForKey(storedVal);
 
-            addPointerListeners(btn, 'click', function (ev) {
-              try {
-                insertAtCursor(storedVal);
-              } catch (e) { console.error('insertAtCursor failed', e); }
-            }, { passive: true });
+
+
+            const isDeva = /[\u0900-\u097F]/.test(storedVal);
+            if (isDeva) {
+            btn.style.fontFamily = "'SanskritFont', 'Andika', sans-serif";
+          }
+
+
+
+
+// --- УМНАЯ ОБРАБОТКА ТАЧ/КЛИКА (чтобы скролл не вызывал нажатия)
+(function attachSmartTap(button, value) {
+  const MOVE_THRESHOLD = 8; // пиксели — увеличь, если на твоём устройстве слишком чувствительно
+  let start = null;   // { x, y, t }
+  let moved = false;
+
+  addPointerListeners(button, 'down', (ev) => {
+    try {
+      start = { x: ev.clientX || 0, y: ev.clientY || 0, t: Date.now() };
+      moved = false;
+    } catch (e) { /* ignore */ }
+  }, { passive: true });
+
+  addPointerListeners(button, 'move', (ev) => {
+    try {
+      if (!start) return;
+      const dx = Math.abs((ev.clientX || 0) - start.x);
+      const dy = Math.abs((ev.clientY || 0) - start.y);
+      if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) moved = true;
+    } catch (e) { /* ignore */ }
+  }, { passive: true });
+
+  addPointerListeners(button, 'up', (ev) => {
+    try {
+      if (!start) return;
+      const dt = Date.now() - start.t;
+      // считаем тапом короткое нажатие без значимого движения
+      if (!moved && dt < 700) {
+        insertAtCursor(value);
+      }
+    } catch (e) { /* ignore */ }
+    start = null;
+    moved = false;
+  }, { passive: true });
+
+  // accessibility: поддержка клавиатурных Enter / Space
+  button.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      try { insertAtCursor(value); } catch (err) {}
+    }
+  });
+
+})(btn, storedVal);
+
 
             rowEl.appendChild(btn);
           });
@@ -1163,29 +1229,37 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
     function setLayoutByKey(key) {
       if (key === 'default') {
         currentLayout = null;
-      } else if (key === 'ru') {
-        currentLayout = [
-          ['й','ц','у','к','е','н','г','ш','щ','з','х','ъ'],
-          ['ф','ы','в','а','п','р','о','л','д','ж','э'],
-          ['я','ч','с','м','и','т','ь','б','ю','.']
-        ];
+
+        
       } else if (key === 'en') {
         currentLayout = [
-          ['a','b','c','d','e','f','g','h','i','j'],
-          ['k','l','m','n','o','p','q','r','s','t'],
-          ['u','v','w','x','y','z']
+['a','ā','i','ī','u','ū'],
+['ṛ','ṝ','ḷ','ḹ'],
+['e','ai','o','au','ṁ','ḥ'],
+['k','kh','g','gh','ṅ'],
+['c','ch','j','jh','ñ'],
+['ṭ','ṭh','ḍ','ḍh','ṇ'],
+['t','th','d','dh','n'],
+['p','ph','b','bh','m'],
+['y','r','l','v'],
+['ś','ṣ','s','h','ḻ'],
+['’','-','|'],
+['. ',',','“','”','‘','’','_','—',':',';','!','?','/','\\','+','=','(',')','{','}','[',']']
+
         ];
       } else if (key === 'sa') {
         currentLayout = [
   ['अ','आ','इ','ई','उ','ऊ'],
-  ['ऋ','ॠ','ऌ','ॡ','ए','ऐ'],
-  ['ओ','औ'],
-  ['क','ख','ग','घ','ङ','च'],
-  ['ड','ढ','ण','त','थ','द'],
-  ['ध','न','प','फ','ब','भ'],
-  ['म','य','र','ल','ळ','ऴ'],
-  ['व','श','ष','स','ह','क्ष'],
-  ['त्र','ज्ञ'],
+  ['ऋ','ॠ','ऌ','ऌ२'],
+  ['ए','ऐ','ओ','औ'],
+  ['क','ख','ग','घ','ङ'],
+  ['च','छ','ज','झ','ञ'],
+  ['ट','ठ','ड','ढ','ण'],
+  ['त','थ','द','ध','न'],
+  ['प','फ','ब','भ','म'],
+  ['य','र','ल','व'],
+  ['श','ष','स'],
+  ['ह','ळ','क्ष'],
   [' ो',' ौ',' ः',' ं'],        
   [' ृ',' ॄ',' ॢ',' ॣ',' े',' ै'],
   ['्','ा',' ि',' ी',' ु',' ू'],
@@ -1204,6 +1278,8 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
     langSelect.addEventListener('change', (e) => {
       setLayoutByKey(e.target.value);
     });
+
+
 
     (function restoreSettings() {
       try {
@@ -1227,4 +1303,3 @@ body.dark #settingsPopup { background: #0b0b0b; color: #fff; border-color: #222;
 
 </body>
 </html>
-
