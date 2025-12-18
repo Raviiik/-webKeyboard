@@ -499,7 +499,7 @@ body.dark textarea {
 }
 
 #saveBtn {
-  position: absolute;
+
   top: 8px;
   right: 8px;
 
@@ -606,7 +606,7 @@ body.dark textarea {
 #textWrapper textarea { box-sizing: border-box; width: 100%; }
 
 #saveBtn{
-  position: absolute;
+
   top: 10px;
   right: 10px;
   width: 42px;
@@ -907,51 +907,29 @@ body.dark {
 
 
 
+#textWrapper { position: relative; }
 
-#snowToggleBtn {
-  position: fixed;
+.textBtns {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 10001;
+  pointer-events: auto;
+}
 
-  top: 12px;
-  right: 62px;   
-
+#saveBtn {
+  position: static; 
+  margin: 0;
   width: 42px;
   height: 42px;
   border-radius: 50%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  cursor: pointer;
-  user-select: none;
-
-  z-index: 10001;
-
-  background-color: #1e1e1e;
-
-  filter: none !important;
-  mix-blend-mode: normal !important;
-  backdrop-filter: none !important;
-
-  transition:
-    background-color .2s ease,
-    opacity .2s ease,
-    transform .1s ease;
 }
-
-#snowToggleBtn:hover {
-  background-color: #2a2a2a;
-}
-
-#snowToggleBtn.off {
-  opacity: 0.35;
-}
-
 
 #snowToggleBtn {
-  position: fixed;
-  top: 12px;
-  right: 464px !important;     
+
   width: 42px;
   height: 42px;
   border-radius: 50%;
@@ -959,15 +937,28 @@ body.dark {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 10001;
   background-color: #1e1e1e;
-  filter: none !important;
-  mix-blend-mode: normal !important;
-  backdrop-filter: none !important;
-  transition: background-color .2s ease, opacity .2s ease, transform .1s ease;
 }
 
 
+
+#snowToggleBtn {
+  position: absolute;          
+  top: 10px;                   
+  right: 60px;                 
+}
+
+#snowToggleBtn {
+  position: absolute !important;
+  top: 10px !important;
+  right: 60px !important; 
+}
+
+#saveBtn {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+}
 
   </style>
 </head>
@@ -2756,6 +2747,7 @@ addTapHandler(item, function (ev) {
 </script>
 
 
+
 <script>
 (function () {
   const btn = document.getElementById('snowToggleBtn');
@@ -2812,6 +2804,8 @@ addTapHandler(item, function (ev) {
   placeSnow();
 })();
 </script>
+
+
 
 </body>
 </html>
