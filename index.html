@@ -908,18 +908,86 @@ body.dark {
 
 
 
+#snowToggleBtn {
+  position: fixed;
+
+  top: 12px;
+  right: 62px;   
+
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  user-select: none;
+
+  z-index: 10001;
+
+  background-color: #1e1e1e;
+
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  backdrop-filter: none !important;
+
+  transition:
+    background-color .2s ease,
+    opacity .2s ease,
+    transform .1s ease;
+}
+
+#snowToggleBtn:hover {
+  background-color: #2a2a2a;
+}
+
+#snowToggleBtn.off {
+  opacity: 0.35;
+}
+
+
+#snowToggleBtn {
+  position: fixed;
+  top: 12px;
+  right: 464px !important;     
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10001;
+  background-color: #1e1e1e;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  backdrop-filter: none !important;
+  transition: background-color .2s ease, opacity .2s ease, transform .1s ease;
+}
+
+
 
   </style>
 </head>
 <body>
   <div class="app">
     <div class="editor">
-     <div id="textWrapper">
-  <textarea id="mainText" placeholder="Write here..." spellcheck="false"
-            autocapitalize="off" autocomplete="off" autocorrect="off"></textarea>
+<div id="textWrapper">
+  <textarea id="mainText"
+            placeholder="Write here..."
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"></textarea>
 
-  <div id="saveBtn" aria-label="Save" title="Save">💾</div>
+  <div class="textBtns">
+    <div id="saveBtn" aria-label="Save" title="Save">💾</div>
+    <div id="snowToggleBtn" aria-label="Snow toggle" title="Snow on/off">❄️</div>
+  </div>
 </div>
+
 
 <div id="saveModal" aria-hidden="true">
   <div id="saveWrapper" role="dialog" aria-modal="true" aria-label="Saves">
@@ -2684,6 +2752,64 @@ addTapHandler(item, function (ev) {
   } else {
     initLangSheet();
   }
+})();
+</script>
+
+
+<script>
+(function () {
+  const btn = document.getElementById('snowToggleBtn');
+  if (!btn) return;
+
+  const KEY = 'snow_enabled';
+
+  function getCanvas() {
+    return document.getElementById('snowCanvas');
+  }
+
+  function setSnow(on) {
+    const canvas = getCanvas();
+    if (!canvas) return;
+
+    canvas.style.display = on ? 'block' : 'none';
+    btn.classList.toggle('off', !on);
+    localStorage.setItem(KEY, on ? '1' : '0');
+  }
+
+  const enabled = localStorage.getItem(KEY) !== '0';
+  setSnow(enabled);
+
+  btn.addEventListener('click', () => {
+    const canvas = getCanvas();
+    if (!canvas) return;
+
+    const isOn = canvas.style.display !== 'none';
+    setSnow(!isOn);
+  });
+})();
+</script>
+
+
+<script>
+(function () {
+  const snow = document.getElementById('snowToggleBtn');
+  const save = document.getElementById('saveBtn');
+  if (!snow || !save) return;
+
+  function placeSnow() {
+    const sr = save.getBoundingClientRect();
+    const desiredX = sr.right + 8;
+    const right = Math.max(6, window.innerWidth - desiredX);
+    snow.style.position = 'fixed';
+    snow.style.top = (sr.top) + 'px'; 
+    snow.style.right = right + 'px';
+    snow.style.zIndex = 10001;
+  }
+
+  window.addEventListener('load', placeSnow);
+  window.addEventListener('resize', placeSnow);
+  window.addEventListener('scroll', placeSnow);
+  placeSnow();
 })();
 </script>
 
