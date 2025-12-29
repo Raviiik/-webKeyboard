@@ -1,0 +1,2710 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Sanscrit_Keybard</title>
+<link rel="icon" href="icons/IconWebMain.ico" type="image/x-icon">
+<link rel="shortcut icon" href="icons/IconWebMain.ico" type="image/x-icon">
+
+
+
+
+  <style>
+
+
+
+@font-face {
+  font-family: "Andika";
+  src: url("fonts/Andika-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+html, body, textarea, .key {
+  font-family: "Andika";
+}
+
+
+:root {
+  --glow-green-core: rgba(80, 220, 140, 0.9);
+  --glow-green-soft: rgba(80, 220, 140, 0.32);
+  --glow-green-ring: 1.4px;
+  --glow-green-blur: 12px;
+
+  --glow-snow-core: rgba(120, 190, 255, 0.95);
+  --glow-snow-soft: rgba(120, 190, 255, 0.38);
+  --glow-snow-ring: 1.8px;
+  --glow-snow-blur: 14px;
+
+  --glow-inset: 0px;
+}
+
+
+
+ 
+    :root { --kbd-width: 360px; --gap: 8px; --key-height: 46px; }
+    html, body { height: 100%; margin: 0; font-family: 'Andika', Inter, "Segoe UI", Roboto, Arial, sans-serif; background: #f5f7fa; color: #111; }
+    .app { display: flex; height: 100vh; gap: 12px; padding: 12px; box-sizing: border-box; }
+    .editor { flex: 1; display: flex; flex-direction: column; }
+    textarea#mainText { flex: 1; resize: none; padding: 14px; font-size: 18px; line-height: 1.5; border-radius: 12px; border: 1px solid #A2A2A2; box-sizing: border-box; background: #fff; -webkit-user-select: text; user-select: text; overflow: auto; }
+    .keyboard { width: var(--kbd-width); min-width: 170px; display: flex; flex-direction: column; gap: 10px; background: #ffffff; border-radius: 12px; padding: 10px; box-shadow: 0 6px 18px rgba(20,30,50,0.06); }
+    .controls { display: flex; flex-direction: column; gap: 8px; }
+    .row-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .btn { padding: 6px 8px; border-radius: 10px; border: 1px solid #999; background: #f0f0f0; cursor: pointer; font-size: 14px; }
+    .btn.secondary { background: #fff; }
+    .btn.toggle-active { background: #e8fff0; border-color: #58b16a; }
+    .status { font-size: 13px; color: inherit; }
+    .small { font-size: 12px; opacity: .85; }
+
+
+
+
+@font-face {
+  font-family: 'SanskritFont';
+  src: url('./fonts/L_Shobhika-Regular.woff2') format('woff2');
+  font-weight: 360;
+  font-style: normal;
+  font-display: swap;
+}
+
+html, body {
+  font-family: 'Andika', Inter, sans-serif;
+}
+
+
+html, body,
+textarea,
+.key,
+.btn {
+  font-family:
+  'Andika',
+    'SanskritFont',   
+    Inter,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+
+    .block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-radius: 10px;
+      padding: 8px;
+      background: rgba(250,250,250,0.95);
+      border: 2px solid #d0d6df;
+      box-shadow: 0 0 6px rgba(0,0,0,0.08) inset;
+      max-height: 30vh;
+      min-height: 80px;
+      overflow-y: auto;
+    }
+
+    .rows { display: flex; flex-direction: column; gap: 10px; overflow: auto; padding-right: 6px; }
+    .row { display: grid; gap: var(--gap); }
+    .key {
+      height: var(--key-height);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 1px solid #d0d6df;
+      background: #fbfdff;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      padding: 8px 10px;
+      font-size: 20px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.02) inset;
+      transition: transform .08s ease, background .12s ease;
+      touch-action: manipulation;
+      color: #111;
+      overflow: hidden;
+    }
+    .key:active { transform: translateY(1px) scale(.99); }
+    .key:hover { background: #eef5ff; }
+    .key.empty { background: transparent; border: none; cursor: default; box-shadow: none; height: var(--key-height); }
+    .btn { transition: transform 0.15s ease; }
+    .btn:hover { transform: scale(1.06); }
+    .btn:active { transform: scale(0.94); }
+    .key:focus, .btn:focus { outline: none; box-shadow: none; }
+    .key, .btn { -webkit-tap-highlight-color: transparent; outline: none; box-shadow: none; }
+    .theme-toggle { width: 90px; height: 38px; border-radius: 19px; background: #ddd; position: relative; cursor: pointer; display: flex; align-items: center; padding: 4px; box-sizing: border-box; transition: background 0.3s ease; }
+    .theme-toggle .thumb { width: 30px; height: 30px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; left: 4px; top: 4px; transition: left 0.3s ease; user-select: none; touch-action: none; font-size: 16px; }
+    .theme-toggle.night { background: #333; }
+    .theme-toggle.night .thumb { left: 56px; }
+    .legend { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .smallBtn { padding: 3px 6px; font-size: 12px; min-width: 40px; }
+    @media (max-width: 900px) {
+      .app { flex-direction: column; padding: 10px; gap: 10px; }
+      .keyboard { position: fixed; bottom: 0; left: 0; right: 0; width: auto; border-radius: 14px 14px 0 0; z-index: 9999; box-shadow: 0 -2px 18px rgba(20,30,50,0.18); max-height: 60vh; }
+      .block { max-height: 20vh; min-height: 64px; }
+      textarea#mainText { font-size: 19px; min-height: 40vh; }
+      .editor { order: 1; }
+    }
+    .key.bind-hover { border-color: #58b16a; transform: translateY(-2px); box-shadow: 0 8px 22px rgba(40,120,60,0.06), 0 0 0 3px rgba(88,177,106,0.08); }
+    .binding-badge { position: absolute; right: 6px; bottom: 6px; font-size: 12px; opacity: 0.85; pointer-events: none; background: rgba(0,0,0,0.03); padding: 2px 6px; border-radius: 8px; backdrop-filter: blur(2px); }
+    body.dark .binding-badge { background: rgba(255,255,255,0.04); color: #fff; opacity: .9; }
+    .binding-badge { display: none !important; }
+    .key-popup { position: absolute; z-index: 99999; min-width: 140px; max-width: 260px; background: #fff; color: #111; border: 1px solid #d8dfe8; box-shadow: 0 6px 18px rgba(20,30,50,0.08); padding: 6px 8px; border-radius: 8px; font-size: 13px; pointer-events: auto; }
+    body.dark .key-popup { background: #121212; color: #fff; border-color: #222; box-shadow: none; }
+    .key-popup .kp-row { display:flex; justify-content:space-between; gap:8px; align-items:center; margin-bottom:6px; }
+    .key-popup .kp-bindings { font-size:12px; opacity:.85; word-break:break-word; }
+    .key-popup .kp-unbind { padding:6px 8px; border-radius:8px; border:1px solid #cfcfcf; background:#fafafa; cursor:pointer; font-size:13px; }
+    body.dark .key-popup .kp-unbind { background:#111; border-color:#333; color:#fff; }
+
+    .key { position: relative; overflow: hidden; }
+    .reject-overlay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; transform-origin: center center; transform: scale(0.18); background: rgba(255, 0, 0, 1); pointer-events: none; z-index: 4; will-change: transform, opacity; animation: rejectFull 620ms cubic-bezier(.2,.8,.2,1) forwards; }
+    @keyframes rejectFull { 0% { transform: scale(0.18); opacity: 1;} 60% { transform: scale(1.0); opacity: 0.95; } 100% { transform: scale(1.04); opacity: 0; } }
+    .success-overlay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; transform-origin: center center; transform: scale(0.18); background: rgba(0,200,0,0.9); pointer-events: none; z-index: 4; border-radius: inherit; animation: successFull 500ms cubic-bezier(.2,.8,.2,1) forwards; }
+    @keyframes successFull { 0% { transform: scale(0.18); opacity: 1; } 80% { transform: scale(1.0); opacity: 0.9; } 100% { transform: scale(1.0); opacity: 0; } }
+
+.icon-btn {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  padding: 6px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.icon-btn img.icon-img,
+.icon-btn svg.icon-fallback {
+  width: 22px !important;
+  height: 22px !important;
+  object-fit: contain;
+}
+
+.btn {
+  font-size: 14px;
+  line-height: 1;
+  height: auto;
+  padding: 6px 8px;
+}
+
+  .block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 12px;
+  padding: 10px;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  box-shadow: 0 4px 14px rgba(20,30,50,0.04);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.dark {
+  background: #000;
+  color: #fff;
+}
+body.dark textarea#mainText {
+  background: #000;
+  color: #fff;
+  border-color: #333;
+}
+body.dark .keyboard {
+  background: #000;
+  border: 1px solid #222;
+  box-shadow: none;
+}
+body.dark .key {
+  background: #111;
+  color: #fff;
+  border-color: #333;
+}
+body.dark .key:hover {
+  background: #161616;
+}
+body.dark .btn {
+  background: #111;
+  color: #fff;
+  border-color: #444;
+}
+body.dark .btn.toggle-active {
+  background: #143016;
+  border-color: #2b7a3a;
+}
+body.dark .block {
+  background: #111;
+  border-color: #222;
+  box-shadow: none;
+}
+
+
+html, body {
+  height: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+#dark-bg {
+  position: fixed;
+  inset: 0;                
+  background: #000;
+  pointer-events: none;
+  z-index: -99999;         
+  display: none;
+}
+
+html.dark, body.dark {
+  color: #fff;
+  background: #000 !important;
+}
+
+#capsBtn.caps-green {
+    background: #3c9a4a;
+    border-color: #3c9a4a;
+    color: #fff;
+}
+
+
+body.dark svg.icon-fallback,
+body.dark svg.icon-fallback * {
+  color: #fff !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+  opacity: 1 !important;
+}
+
+
+body.dark img.icon-img {
+  filter: brightness(0) invert(1) !important;
+  -webkit-filter: brightness(0) invert(1) !important;
+  opacity: 1 !important;
+}
+
+
+body.dark img.icon-img[src$=".svg"] {
+  filter: brightness(0) invert(1) !important;
+}
+
+
+body.dark svg.icon-fallback {
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+
+
+body.dark svg {
+  color: #fff !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+
+#dark-bg {
+  position: fixed;
+  inset: 0;                
+  background: #000;
+  pointer-events: none;
+  z-index: 2147483646;      
+  display: none;
+  opacity: 1;
+}
+
+body.dark #dark-bg,
+html.dark #dark-bg {
+  display: block;
+}
+
+html, body {
+  background: transparent !important;
+}
+
+body.dark,
+html.dark {
+  scrollbar-color: #444 #000; 
+}
+
+body.dark::-webkit-scrollbar,
+html.dark::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+body.dark::-webkit-scrollbar-track,
+html.dark::-webkit-scrollbar-track {
+  background: #000 !important; 
+}
+
+body.dark::-webkit-scrollbar-thumb,
+html.dark::-webkit-scrollbar-thumb {
+  background-color: #ffffff;       
+  border-radius: 6px;
+  border: 2px solid #000;       
+}
+
+body.dark::-webkit-scrollbar-thumb:hover,
+html.dark::-webkit-scrollbar-thumb:hover {
+  background-color: #ffffff;
+}
+
+textarea#mainText { letter-spacing: 0.01em; }
+
+:root {
+  --key-height: 46px;
+  --gap: 8px;
+  --rows-extra: 12px;
+}
+
+.block .rows {
+  overflow-y: auto;
+  max-height: calc(
+    (var(--key-height) * var(--max-rows, 0))
+    + (var(--gap) * (var(--max-rows, 0) - 1))
+    + var(--rows-extra)
+  );
+}
+
+.block#block0 { --max-rows: 5; } 
+.block#block1 { --max-rows: 5; }
+.block#block2 { --max-rows: 3; }
+
+
+:root{
+  --block-sep-color: #fff;   
+  --block-sep-height: 2px;    
+  --block-sep-inset: 12px;    
+  --block-sep-opacity: 1;
+  --block-sep-radius: 10px;
+}
+
+body.dark .block {
+  position: relative;
+  background: #000 !important;
+  border-color: #000 !important;
+  box-shadow: none !important;
+  color: #fff !important;
+}
+
+body.dark .block::before {
+  content: "";
+  position: absolute;
+  left: var(--block-sep-inset);
+  right: var(--block-sep-inset);
+  height: var(--block-sep-height);
+  top: 0;
+  transform: translateY(-50%); 
+  background: var(--block-sep-color);
+  opacity: var(--block-sep-opacity);
+  pointer-events: none;
+  border-radius: var(--block-sep-radius);
+  z-index: 3;
+}
+
+
+#toggleThreeBtn { 
+  width:46px; height:46px; min-width:46px; min-height:46px; padding:6px; box-sizing:border-box;
+  display:flex; align-items:center; justify-content:center;
+}
+
+#toggleThreeBtn img.icon-img,
+#toggleThreeBtn svg.icon-fallback {
+  width: 22px;              
+  height: 22px;
+  display:block;
+  transform-origin: center center;
+  transform: scale(1.6) translateX(0px) translateY(0.6px); 
+}
+
+#backspaceBtn,
+#spaceBtn {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  box-sizing: border-box;
+  padding: 6px;
+  position: relative;        
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;        
+}
+
+
+#backspaceBtn img.icon-img,
+#backspaceBtn svg.icon-fallback {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(calc(-50% - 0.5px), -50%) scale(1.2);
+  transform-origin: center center;
+  transform-box: fill-box;  
+  width: auto;              
+  height: auto;
+  display: block;
+  pointer-events: none;     
+  z-index: 2;
+}
+
+
+#spaceBtn img.icon-img,
+#spaceBtn svg.icon-fallback {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(calc(-50% - -0.9px), calc(-50% + 6px)) scale(1.2);
+  transform-origin: center center;
+  transform-box: fill-box;
+  width: auto;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+
+#spaceBtn {
+  width: 46px;     
+  height: 46px;      
+  min-width: 40px;
+  min-height: 46px;
+  box-sizing: border-box;
+  padding: 6px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+
+
+
+
+
+#textWrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; 
+}
+
+
+
+
+#saveModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+}
+
+#saveWrapper {
+  width: 320px;
+  max-height: 70vh;
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow: hidden;
+}
+
+#saveList {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.saveItem {
+  padding: 12px;
+  background: #eef4ff;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deleteSave {
+  color: red;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.openSave {
+  font-size: 20px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  margin-right: 5px;
+}
+
+#newSave {
+  display: flex;
+  gap: 10px;
+}
+
+#newSave input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+#newSave button {
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+}
+
+#closeSave {
+  background: #888;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  color: white;
+}
+
+
+#textWrapper { position: relative; display: inline-block; width: 100%; }
+#textWrapper textarea { box-sizing: border-box; width: 100%; }
+
+
+
+#saveModal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.55); z-index: 100000; }
+#saveWrapper { width: 320px; max-height: 75vh; background: var(--modal-bg,#fff); border-radius: 16px; padding: 18px; box-sizing: border-box; display:flex; flex-direction:column; gap:12px; overflow: hidden; }
+#saveList { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding-right:6px; }
+.saveItem { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px; border-radius:10px; background: #f1f7ff; }
+.saveMeta { font-size:12px; color:#666; margin-top:6px; }
+.openSave{ background:none; border:none; font-size:18px; cursor:pointer; margin-right:8px; }
+.deleteSave{ background:none; border:none; font-size:18px; cursor:pointer; color:#d44; }
+
+#newSave { display:flex; gap:8px; }
+#newSave input { flex:1; padding:8px; border-radius:10px; border:1px solid #ccc; }
+#newSave button { padding:8px 12px; border-radius:10px; border:none; background:#4a90e2; color:#fff; cursor:pointer; }
+
+#closeSave{ margin-top:6px; padding:10px; border-radius:10px; border:none; background:#888; color:white; cursor:pointer; }
+
+#saveList { -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+
+
+#saveModal {
+  font-family: 'Andika', sans-serif !important;
+}
+
+#saveWrapper {
+  background: #242424 !important;
+  color: #ffffff !important;
+  border: 1px solid #333 !important;
+  font-family: 'Andika', sans-serif !important;
+}
+
+#saveWrapper h3 {
+  color: #ffffff !important;
+  font-family: 'Andika', sans-serif !important;
+}
+
+#saveList {
+  background: #1e1e1e !important;
+  border-radius: 12px;
+  padding: 6px;
+}
+
+.saveItem {
+  background: #2c2c2c !important;
+  border: 1px solid #3b3b3b !important;
+  color: #ffffff !important;
+  font-family: 'Andika', sans-serif !important;
+}
+
+.saveItem strong {
+  color: #ffffff !important;
+}
+
+.saveMeta {
+  color: #bbbbbb !important;
+}
+
+.openSave, .deleteSave {
+  background: none !important;
+  border: none !important;
+  cursor: pointer;
+  font-size: 18px;
+  color: #ffffff !important;
+}
+
+.deleteSave {
+  color: #ff5c5c !important;
+}
+
+#newSave input {
+  background: #1a1a1a !important;
+  border: 1px solid #444 !important;
+  color: #fff !important;
+  border-radius: 10px;
+  padding: 8px;
+  font-family: 'Andika', sans-serif !important;
+}
+
+#newSave button {
+  background:  #3a78ff !important;
+  color: white !important;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-family: 'Andika', sans-serif !important;
+}
+
+#closeSave {
+  background: #3a3a3a !important;
+  color: white !important;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Andika', sans-serif !important;
+}
+
+#saveList::-webkit-scrollbar {
+  width: 8px;
+}
+#saveList::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+#saveList::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+#saveList::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+#textWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;   
+  min-height: 0;    
+}
+
+textarea#mainText {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;       
+  box-sizing: border-box;
+  resize: vertical;    
+  padding: 14px;
+}
+
+
+#mobileOverlay {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#mobileOverlay[hidden] {
+  display: none;
+}
+
+.mobileBox {
+  position: relative;
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+}
+
+.mobileIcon {
+  font-size: 64px;
+  margin-bottom: 24px;
+  fill: #242424;
+}
+
+.mobileBtn {
+  background: #242424;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 14px 24px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.mobileRemember {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-size: 14px;
+  color: #444;
+}
+
+.mobileClose {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+
+
+.mobileIcon img {
+  width: 90px;
+  height: 90px;
+  display: block;
+  margin: 0 auto;
+}
+
+
+.mobileClose {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+
+  width: 24px;
+  height: 24px;
+
+  padding: 0;
+  border: none;
+  background: none;
+
+  cursor: pointer;
+  z-index: 1000000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileClose img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+
+
+
+body:not(.dark) #saveBtn {
+  background-color: #4a90e2
+;
+  color: #111;
+}
+
+
+
+body:not(.dark) #saveBtn:hover {
+  background-color: #a0d2ff
+;
+}
+
+body.dark #saveBtn:hover {
+  background-color: #2a2a2a;
+}
+
+
+
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #bdbdbd transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #bdbdbd;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #9e9e9e;
+}
+
+body.dark * {
+  scrollbar-color: #6e6e6e transparent;
+}
+
+body.dark *::-webkit-scrollbar-thumb {
+  background-color: #6e6e6e;
+}
+
+body.dark *::-webkit-scrollbar-thumb:hover {
+  background-color: #8a8a8a;
+}
+
+body .controls .btn,
+body .controls .icon-btn,
+body #saveBtn,
+body #capsBtn {
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+}
+
+body .controls .btn::after,
+body .controls .icon-btn::after,
+body #saveBtn::after,
+body #capsBtn::after {
+  content: "";
+  position: absolute;
+  inset: var(--glow-inset);
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .16s ease, box-shadow .16s ease;
+}
+
+
+
+
+
+
+body:not(.dark) .controls .btn:not(.snow-toggle),
+body:not(.dark) .controls .icon-btn:not(.snow-toggle) {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1px solid #dfdfdf !important;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  border-radius: 10px;
+  transition: transform 0.14s ease,
+              box-shadow 0.14s ease,
+              background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body:not(.dark) .controls .btn:not(.snow-toggle):hover,
+body:not(.dark) .controls .icon-btn:not(.snow-toggle):hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+}
+
+body:not(.dark) .controls .btn:not(.snow-toggle):active,
+body:not(.dark) .controls .icon-btn:not(.snow-toggle):active {
+  transform: translateY(0) scale(0.995);
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.15) inset;
+}
+
+
+body:not(.dark) .controls .btn.toggle-active::after,
+body:not(.dark) .controls .icon-btn.toggle-active::after,
+body:not(.dark) #saveBtn.toggle-active::after {
+  opacity: 1;
+  box-shadow:
+    0 0 0 var(--glow-ring) var(--glow-green-core),
+    0 0 var(--glow-blur) var(--glow-green-soft);
+}
+
+body:not(.dark) #capsBtn.caps-dim::after {
+  opacity: 1;
+  box-shadow:
+    0 0 0 1px var(--glow-green-core),
+    0 0 6px var(--glow-green-soft);
+}
+
+body:not(.dark) #capsBtn.caps-green::after {
+  opacity: 1;
+  box-shadow:
+    0 0 0 1.6px var(--glow-green-core),
+    0 0 12px var(--glow-green-soft);
+}
+
+
+
+
+
+body.dark .controls .btn:not(.snow-toggle),
+body.dark .controls .icon-btn:not(.snow-toggle),
+body.dark #saveBtn {
+  background: #121212;
+  color: #f1f1f1;
+  border: 1px solid #1f1f1f;
+  border-radius: 10px;
+
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.75),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.14s ease,
+    background 0.12s ease;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+
+body.dark .controls .btn:not(.snow-toggle):hover,
+body.dark .controls .icon-btn:not(.snow-toggle):hover,
+body.dark #saveBtn:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+}
+
+
+body.dark .controls .btn:not(.snow-toggle):active,
+body.dark .controls .icon-btn:not(.snow-toggle):active,
+body.dark #saveBtn:active {
+  transform: translateY(0) scale(0.995);
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.85) inset;
+}
+
+
+
+
+
+body.dark .controls .btn,
+body.dark .controls .icon-btn,
+body.dark #saveBtn {
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+}
+
+body.dark .controls .btn::after,
+body.dark .controls .icon-btn::after,
+body.dark #saveBtn::after,
+body.dark #capsBtn::after {
+  content: "";
+  position: absolute;
+  inset: 0px;              
+  border-radius: inherit;   
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .16s ease, box-shadow .16s ease, transform .16s ease;
+  transform: scale(0.98);
+}
+
+body.dark .controls .btn.toggle-active::after,
+body.dark .controls .icon-btn.toggle-active::after,
+body.dark #saveBtn.toggle-active::after {
+  opacity: 1;
+  transform: scale(1.02);
+  box-shadow:
+    0 0 0 1.6px rgba(80,220,140,0.85),  
+    0 0 12px rgba(80,220,140,0.45),     
+    0 0 36px rgba(80,220,140,0.22);     
+}
+
+body.dark #capsBtn.caps-dim::after {
+  opacity: 1;
+  transform: scale(1.02);
+  box-shadow:
+    0 0 0 1.2px rgba(120,255,180,0.72),
+    0 0 10px rgba(120,255,180,0.30);
+}
+
+body.dark #capsBtn.caps-green::after {
+  opacity: 1;
+  transform: scale(1.06);
+  box-shadow:
+    0 0 0 2px rgba(80,220,140,0.95),
+    0 0 20px rgba(80,220,140,0.55),
+    0 0 48px rgba(80,220,140,0.32);
+}
+
+
+
+body:has(#saveModal[aria-hidden="false"]) body.dark #saveBtn::after,
+body.dark #saveBtn[aria-pressed="true"]::after {
+
+  opacity: 1;
+  transform: scale(1.04);
+  box-shadow:
+    0 0 0 1.6px rgba(80,220,140,0.85),
+    0 0 14px rgba(80,220,140,0.48),
+    0 0 48px rgba(80,220,140,0.26);
+}
+
+body.dark .key::after { content: none; }   
+body.dark .key:hover {
+  background: #161616;
+  box-shadow: none;
+}
+
+body.dark #saveBtn {
+  border-radius: 50%;
+}
+body.dark #saveBtn::after {
+  inset: -8px; 
+}
+
+body.dark .controls .btn.toggle-active:focus-visible::after,
+body.dark #capsBtn.caps-green:focus-visible::after,
+body.dark #saveBtn.toggle-active:focus-visible::after {
+  box-shadow:
+    0 0 0 1.8px rgba(80,220,140,0.95),
+    0 0 18px rgba(80,220,140,0.6),
+    0 0 64px rgba(80,220,140,0.34);
+}
+
+
+.controls .btn.toggle-active::after,
+.controls .icon-btn.toggle-active::after,
+#saveBtn.toggle-active::after {
+  opacity: 1;
+  box-shadow:
+    0 0 0 var(--glow-green-ring) var(--glow-green-core),
+    0 0 var(--glow-green-blur) var(--glow-green-soft);
+}
+
+
+#snowBtn.toggle-active::after {
+  opacity: 1;
+  box-shadow:
+    0 0 0 var(--glow-snow-ring) var(--glow-snow-core),
+    0 0 var(--glow-snow-blur) var(--glow-snow-soft);
+}
+
+
+#saveBtn {
+  border-radius: 10px !important;
+}
+
+#saveBtn::after {
+  inset: var(--glow-inset);
+  border-radius: inherit;
+}
+
+
+body.dark #saveBtn {
+  border-radius: 50%;
+}
+body.dark #saveBtn::after {
+  inset: -8px;
+}
+
+
+
+body:not(.dark) #capsBtn::after {
+
+  inset: var(--glow-inset);
+  border-radius: inherit;
+}
+
+body:not(.dark) #capsBtn.caps-dim::after {
+  opacity: 1;
+  box-shadow:
+    0 0 0 1.2px var(--glow-green-core),
+    0 0 8px var(--glow-green-soft);
+}
+
+
+body:not(.dark) #capsBtn.caps-green::after {
+  opacity: 1;
+  transform: scale(1.06);
+  box-shadow:
+    0 0 0 2px rgba(80,220,140,0.95),
+    0 0 20px rgba(80,220,140,0.55),
+    0 0 48px rgba(80,220,140,0.32);
+}
+
+body:not(.dark) #bindModeBtn.toggle-active::after {
+  opacity: 1;
+  transform: scale(1.02);
+  box-shadow:
+    0 0 0 1.6px rgba(80,220,140,0.85),
+    0 0 12px rgba(80,220,140,0.45),
+    0 0 36px rgba(80,220,140,0.22);
+}
+
+
+body:not(.dark) #toggleThreeBtn {
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+}
+
+body:not(.dark) #toggleThreeBtn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+body:not(.dark) #toggleThreeBtn.toggle-active::after {
+  opacity: 1;
+  transform: scale(1.02);
+  box-shadow:
+    0 0 0 var(--glow-green-ring) var(--glow-green-core),
+    0 0 var(--glow-green-blur) var(--glow-green-soft);
+}
+
+body:not(.dark) #toggleThreeBtn.toggle-active:focus-visible::after {
+  box-shadow:
+    0 0 0 1.0px rgba(80,220,140,0.95),
+    0 0 18px rgba(80,220,140,0.6),
+    0 0 64px rgba(80,220,140,0.34);
+}
+
+
+#downloadModal {
+  position: fixed;
+  inset: 0;
+  display: none;                
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.55);
+  z-index: 1200000;            
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.downloadBox {
+  width: 340px;
+  max-width: calc(100% - 40px);
+  background: #fff;
+  color: #111;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  text-align: center;
+  transform: translateY(-6px) scale(.98);
+  opacity: 0;
+  transition: transform .22s ease, opacity .22s ease;
+}
+
+#downloadModal.show .downloadBox {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.downloadBtn {
+  display:inline-block;
+  padding:12px 20px;
+  border-radius:999px;
+  background:#3a78ff;
+  color:#fff;
+  text-decoration:none;
+  font-weight:600;
+  margin-top:8px;
+}
+
+.downloadClose {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  border: none;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+  .downloadBox { background: #141414; color: #fff; border: 1px solid #222; }
+  .downloadBtn { background: #2a62d6; }
+}
+
+
+.downloadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;                 
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: #3a78ff;
+  text-decoration: none;
+  font-weight: 400;
+
+}
+
+.downloadBtn .btnIcon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+
+.downloadClose {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.downloadClose .closeIcon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.downloadClose img,
+.downloadClose svg {
+  pointer-events: none;
+}
+
+body.dark img.icon-img {
+  filter: brightness(0) invert(1);
+}
+
+
+.icon-btn .icon-img {
+  transform: translateX(0.4px);
+
+}
+
+
+.downloadBtn .btnIcon {
+  filter: brightness(0) invert(1);
+}
+
+
+.downloadClose .closeIcon {
+    filter: brightness(0) invert(1); 
+}
+
+
+
+body:not(.dark) img.icon-img[src$="save.svg"],
+body:not(.dark) img.icon-img[src$="snow.svg"] {
+  filter: invert(1); 
+  -webkit-filter: invert(1);
+}
+
+body.dark img.icon-img { filter: brightness(0) invert(1) !important; }
+
+.icon-btn,
+.icon-btn *,
+img.icon-img,
+svg {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: auto;
+}
+
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="editor">
+
+<div id="textWrapper">
+  <textarea id="mainText"
+            placeholder="Write here..."
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"></textarea>
+</div>
+
+<div id="saveModal" aria-hidden="true">
+  <div id="saveWrapper" role="dialog" aria-modal="true" aria-label="Saves">
+    <h3 style="margin:0 0 6px 0;">Saves</h3>
+    <div id="saveList"></div>
+
+    <div id="newSave">
+      <input id="saveName" placeholder="Title (max. 60 characters)" maxlength="60" />
+      <button id="createSave">Create</button>
+    </div>
+
+    <button id="closeSave">Close</button>
+  </div>
+</div>
+
+<div id="saveModal" aria-hidden="true">
+  <div id="saveWrapper" role="dialog" aria-modal="true" aria-label="Saves">
+    <h3>Saves</h3>
+
+    <div id="saveList"></div>
+
+    <div id="newSave">
+      <input id="saveName"
+             placeholder="Title (max. 60 characters)"
+             maxlength="60">
+      <button id="createSave">Create</button>
+    </div>
+
+    <button id="closeSave">Close</button>
+  </div>
+</div>
+
+      <div style="padding-top:8px; display:flex; justify-content:space-between; align-items:center;">
+        <div class="small"></div>
+        <div class="small"></div>
+      </div>
+    </div>
+
+    <div class="keyboard" id="keyboard" aria-live="polite">
+      <div class="controls">
+        <div class="legend">
+          <div style="display:flex;align-items:center;gap:10px">
+            <label style="display:flex;align-items:center;gap:6px">
+              <input type="checkbox" id="allowPhysical"> lock system keyboard
+            </label>
+
+            <button class="btn icon-btn" id="copyBtn" title="Copy all" aria-label="Copy all">
+              <img class="icon-img" src="icons//copy.svg" alt="copy" decoding="async" draggable="false">
+              <svg class="icon-fallback icon-fallback-copy" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="6" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                <rect x="4" y="4" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/>
+              </svg>
+            </button>
+
+            <button class="btn icon-btn" id="bindModeBtn" title="Режим привязки клавиш — наведи на клавишу и нажми физическую кнопку" aria-label="Bind mode">
+              <img class="icon-img" id="capsIcon" src="icons//binding.svg" alt="binding" decoding="async" draggable="false">
+            </button>
+
+            <button class="btn icon-btn" id="backspaceBtn" title="Backspace / delete" aria-label="Backspace">
+              <img class="icon-img" src="icons//backspace.svg" alt="backspace" decoding="async" draggable="false">
+            </button>
+
+            <button class="btn icon-btn" id="capsBtn" title="Чтобы зажать кнопку нажмите на нее два раза"aria-label="Caps">
+              <img class="icon-img" id="capsIcon" src="icons//caps.svg" alt="caps" decoding="async" draggable="false">
+            </button>
+
+
+          </div>
+
+
+<div class="theme-toggle" id="themeToggle"> <div class="thumb" id="themeThumb">☀️</div> </div>
+
+
+
+            <button class="btn icon-btn" id="spaceBtn" title="Space" aria-label="Space">
+              <img class="icon-img" src="icons//space.svg" alt="space" decoding="async" draggable="false">
+            </button>
+
+<button class="btn icon-btn" id="saveBtn" type="button">
+  <img src="icons/save.svg" alt="" class="icon-img" decoding="async" draggable="false">
+</button>
+
+
+<button class="btn icon-btn" id="snowBtn" type="button">
+  <img src="icons/snow.svg" alt="" class="icon-img" decoding="async" draggable="false">
+</button>
+
+</style>
+
+<script>
+(function() {
+  const themeToggle = document.getElementById("themeToggle");
+  const themeThumb = document.getElementById("themeThumb");
+
+  themeToggle.addEventListener("click", () => {
+    const isDark = document.body.classList.toggle("dark");
+    themeToggle.classList.toggle("night", isDark);
+    themeThumb.textContent = isDark ? "🌙" : "☀️";
+  });
+})();
+</script>
+
+
+
+<button id="toggleThreeBtn" class="btn icon-btn" title="Переключить раскладку" aria-label="Toggle layout">
+  <img class="icon-img" src="icons//settings.svg" alt="toggle layout" decoding="async" draggable="false">
+  <svg class="icon-fallback" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+    <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+        </div>
+      </div>
+
+      <div class="blocks" id="blocksContainer">
+        <div class="block" id="block0">
+          <div id="rowsContainer0" class="rows" aria-label="Keys block 1"></div>
+        </div>
+
+        <div class="block" id="block1">
+          <div id="rowsContainer1" class="rows" aria-label="Keys block 2"></div>
+        </div>
+
+        <div class="block" id="block2">
+          <div id="rowsContainer2" class="rows" aria-label="Keys block 3"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+  (function ensureIconFallbacks() {
+    const iconButtons = document.querySelectorAll('.icon-btn');
+    iconButtons.forEach(btn => {
+      const img = btn.querySelector('img.icon-img');
+      const fallback = btn.querySelector('svg.icon-fallback');
+      if (!img) {
+        if (fallback) fallback.style.display = 'inline-block';
+        return;
+      }
+      if (img.complete && img.naturalWidth > 0) {
+        img.style.display = 'inline-block';
+        if (fallback) fallback.style.display = 'none';
+      } else if (img.complete && img.naturalWidth === 0) {
+        img.style.display = 'none';
+        if (fallback) fallback.style.display = 'inline-block';
+      } else {
+        img.addEventListener('load', () => {
+          img.style.display = 'inline-block';
+          if (fallback) fallback.style.display = 'none';
+        });
+        img.addEventListener('error', () => {
+          img.style.display = 'none';
+          if (fallback) fallback.style.display = 'inline-block';
+        });
+      }
+    });
+  })();
+  </script>
+
+<script>
+const DEVANAGARI_RE = /[\u0900-\u097F\uA8E0-\uA8FF\u1CD0-\u1CFF]/;
+function containsDevanagari(s) {
+  try {
+    if (!s) return false;
+    return DEVANAGARI_RE.test(String(s));
+  } catch (e) {
+    return false;
+  }
+}
+</script>
+
+<script>
+(function(){
+  function safeLogError(err){ console.error('Webkbd error:', err); }
+  window.addEventListener('error', function(ev){ try{ safeLogError(ev.error||ev.message||ev); }catch(e){} });
+  window.addEventListener('unhandledrejection', function(ev){ try{ safeLogError(ev.reason); }catch(e){} });
+
+  const KEYS_DEF = [
+    [
+      ['а','ā','и','ӣ','у','ӯ'],
+      ['рь','рь̄','љ','љ̄'],
+      ['ԑ','о','әı','ɔү'],
+      ['⦂','ᵒ'],
+      ['к','к᷉','г','г᷉','ӈ'],
+      ['ч','ч᷉','џ','џ᷉','њ'],
+      ['ԏ','ԏ᷉','ԃ','ԃ᷉','ԋ'],
+      ['т','т᷉','д','д᷉','н'],
+      ['п','п᷉','б','б᷉','м'],
+      ['й','р','л','в'],
+      ['щ','ш','с','х'],
+      ['•','‿','⁀','ɐ'],
+      ['ԑ̆','о̆']
+    ],
+    [
+      ['а','б','в','г','е','ё'],
+      ['ж','з','і','и','ѵ','к'],
+      ['л','м','н','о','п','р'],
+      ['с','т','у','ф','ѳ','х'],
+      ['ц','ч','ш','щ','ъ','ы'],
+      ['ь','э','ю','я','ѣ'],
+      ['!',',','.','…',':',';'],
+      ['?','¿','⸮','‘','’'],
+      ['„','“','«','»','‹','›'],
+      ['-','—','_','(',')'],
+      ['1','2','3','4','5','6'],
+      ['7','8','9','0']
+    ],
+    [
+      ['➀','➁','➂','➃','➄','➅'],
+      ['➆', '❕', '`','°','√','*'],
+      ['^','+','=','≠','≥','±'],
+      ['~','≈','|','/'],
+      ['[',']','{','}','<','>'],
+      ['←','→','↓','↑','↙','↗']
+    ]
+  ];
+
+
+const KEYS_ALT_DEF = [
+  ['अ','आ','इ','ई','उ','ऊ'],
+  ['ऋ','ॠ','ऌ','ऌ२'],
+  ['ए','ऐ','ओ','औ','ं','ः'],
+  ['क','ख','ग','घ','ङ'],
+  ['च','छ','ज','झ','ञ'],
+  ['ट','ठ','ड','ढ','ण'],
+  ['त','थ','द','ध','न'],
+  ['प','फ','ब','भ','म'],
+  ['य','र','ल','व',],
+  ['श','ष','स'],
+  ['ह','ळ','क्ष'],
+  ['्','ा','ि','ी','ु','ू'],
+  ['ृ','ॄ','ॢ','ॢ२','े','ै',],
+  ['ो','ौ','।','॥','ऽ','ँ'],
+  ['०','१','२','३','४','५'],
+  ['६','७','८','९'],
+];
+
+
+
+
+
+  const KEYS_BLOCKS_SET1 = KEYS_DEF; 
+  const KEYS_BLOCKS_SET2 = [
+    KEYS_ALT_DEF.slice(0,11),
+    KEYS_ALT_DEF.slice(11,14),
+    KEYS_ALT_DEF.slice(14,17)
+  ];
+
+  const CAPS_MAP = new Map([
+    ['а','А'], ['ā','Ā'], ['и','И'], ['ӣ','Ӣ'], ['у','У'], ['ӯ','Ӯ'],
+    ['рь','РЬ'], ['рь̄ ','РЬ̄ '], ['љ','Љ'], ['љ̄','Љ̄'],
+    ['ԑ','Ԑ'], ['о','О'], ['⦂','⦂'], ['ә','Ә'], ['ɔ','Ɔ'], ['ᵒ','ᵒ'],
+    ['к','К'], ['к᷉','К᷉'], ['г','Г'], ['г᷉','Г᷉'], ['ӈ','Ӈ'],
+    ['ч','Ч'], ['ч᷉','Ч᷉'], ['џ','Џ'], ['џ᷉','Џ᷉'], ['њ','Њ'],
+    ['ԏ','Ԏ'], ['ԏ᷉','Ԏ᷉'], ['ԃ','Ԃ'], ['ԃ᷉','Ԃ᷉'], ['ԋ','Ԋ'],
+    ['т','Т'], ['т᷉','Т᷉'], ['д','Д'], ['д᷉','Д᷉'], ['н','Н'],
+    ['п','П'], ['п᷉','П᷉'], ['б','Б'], ['б᷉','Б᷉'], ['м','М'],
+    ['й','Й'], ['р','Р'], ['л','Л'], ['в','В'],
+    ['щ','Щ'], ['ш','Ш'], ['с','С'], ['х','Х'], ['ԉ','Ԉ'],
+    ['а','А'], ['б','Б'], ['в','В'], ['г','Г'], ['д','Д'], ['е','Е'], ['ё','Ё'],
+    ['ж','Ж'], ['з','З'], ['і','І'], ['и','И'], ['ѵ','Ѵ'], ['к','К'], ['л','Л'],
+    ['м','М'], ['н','Н'], ['о','О'], ['п','П'], ['р','Р'], ['с','С'], ['т','Т'],
+    ['у','У'], ['ф','Ф'], ['ѳ','Ѳ'], ['х','Х'], ['ц','Ц'], ['ч','Ч'], ['ш','Ш'],
+    ['щ','Щ'], ['ъ','Ъ'], ['ы','Ы'], ['ь','Ь'], ['э','Э'], ['ю','Ю'], ['я','Я'],
+    ['ѣ','Ѣ'],
+  ]);
+
+  const STORAGE_ALLOW = 'webkbd_allow_v5';
+  const STORAGE_CAPS  = 'webkbd_caps_v2';
+  const STORAGE_THEME = 'webkbd_theme_v1';
+  const STORAGE_BIND  = 'webkbd_bindings_v1';
+
+  const keyboardEl     = document.getElementById('keyboard') || document.querySelector('.keyboard') || document.body;
+  const allowPhysical  = document.getElementById('allowPhysical');
+  const mainText       = document.getElementById('mainText');
+  const copyBtn        = document.getElementById('copyBtn');
+  const backspaceBtn   = document.getElementById('backspaceBtn');
+  const spaceBtn       = document.getElementById('spaceBtn');
+  const capsBtn        = document.getElementById('capsBtn');
+  const themeToggle    = document.getElementById('themeToggle');
+  const themeThumb     = document.getElementById('themeThumb');
+  const bindModeBtn    = document.getElementById('bindModeBtn');
+
+  const rowsContainers = [
+    document.getElementById('rowsContainer0'),
+    document.getElementById('rowsContainer1'),
+    document.getElementById('rowsContainer2')
+  ];
+
+  let maxColsArr = [6,6,6];
+  let capsState = 0;          
+  let usingAltSet = false;    
+  let capsOn  = false;
+  let darkOn  = false;
+
+  let bindings = {};
+  let vBindings = {};
+
+  let bindMode = false;
+  let hoveredKey = null;
+  let hoveredKeyBlock = null;
+
+  function normalizePhysKey(e){
+    try{
+      const parts = [];
+      if (e.ctrlKey) parts.push('Ctrl');
+      if (e.altKey) parts.push('Alt');
+      if (e.metaKey) parts.push('Meta');
+      if (e.shiftKey) parts.push('Shift');
+      try{ if (typeof e.getModifierState === 'function' && e.getModifierState('CapsLock')) parts.push('CapsLock'); }catch(ex){}
+      let k = e.key || e.code || '';
+      if (k === ' ') k = 'Space';
+      if (k === 'Esc') k = 'Escape';
+      if (k === 'OS') k = 'Meta';
+      if (typeof k === 'string' && k.length === 1) k = k.toLowerCase();
+      if (parts.length) return parts.join('+') + '+' + k;
+      return String(k);
+    }catch(err){
+      try{ return String(e.code || e.key || ''); }catch(e2){ return ''; }
+    }
+  }
+
+let darkBgEl = null;
+
+
+
+function applyTheme() { try { document.body.classList.toggle('dark', !!darkOn); if (themeToggle) themeToggle.classList.toggle('night', !!darkOn); if (themeThumb) themeThumb.textContent = darkOn ? "🌙" : "☀️"; } catch (e) { console.error('applyTheme error', e); } }
+
+  function saveAll(){
+    try{
+      if (allowPhysical) localStorage.setItem(STORAGE_ALLOW, JSON.stringify(!!allowPhysical.checked));
+      localStorage.setItem(STORAGE_CAPS, JSON.stringify(Number(capsState)));
+      localStorage.setItem(STORAGE_THEME, JSON.stringify(!!darkOn));
+      try{ localStorage.setItem(STORAGE_BIND, JSON.stringify(bindings)); }catch(e){}
+    }catch(e){}
+  }
+
+  function loadAll(){
+    try{
+      const a = JSON.parse(localStorage.getItem(STORAGE_ALLOW));
+      if (typeof a === 'boolean' && allowPhysical) allowPhysical.checked = a;
+    }catch(e){}
+    try{
+      const cap = JSON.parse(localStorage.getItem(STORAGE_CAPS));
+      if (typeof cap === 'number') capsState = cap;
+      else if (typeof cap === 'string' && cap.length>0 && !isNaN(Number(cap))) capsState = Number(cap);
+      else capsState = 0;
+    }catch(e){ capsState = 0; }
+    capsOn = (capsState === 1 || capsState === 2);
+    try{
+      const th = JSON.parse(localStorage.getItem(STORAGE_THEME));
+      if (typeof th === 'boolean') darkOn = th;
+    }catch(e){ darkOn = false; }
+
+    try{
+      const b = JSON.parse(localStorage.getItem(STORAGE_BIND));
+      if (b && typeof b === 'object'){
+        bindings = b;
+        vBindings = {};
+        Object.keys(bindings).forEach(k=>{
+          const v = bindings[k];
+          if (!vBindings[v]) vBindings[v] = [];
+          if (!vBindings[v].includes(k)) vBindings[v].push(k);
+        });
+      } else { bindings = {}; vBindings = {}; }
+    }catch(e){ bindings = {}; vBindings = {}; }
+
+    updateCapsUI();
+    applyTheme();
+  }
+
+  function buildRows(defRows, cols){
+    const out=[];
+    try{
+      defRows.forEach(row=>{
+        if(!Array.isArray(row)) return;
+        if(row.length<=cols) out.push(row.slice());
+        else for(let i=0;i<row.length;i+=cols) out.push(row.slice(i,i+cols));
+      });
+    }catch(e){ console.error('buildRows error', e); }
+    return out;
+  }
+
+  function applyCaps(text){
+    if(!capsOn || !text) return text;
+    let res='';
+    for(const ch of text) res += CAPS_MAP.get(ch) || ch;
+    return res;
+  }
+
+  function displayTextForKey(originalVal){
+    return applyCaps(originalVal);
+  }
+
+  function updateBindingsUI(){
+  }
+
+  let currentPopup = null;
+  function showKeyPopup(btn, ev){
+    try{
+      hideKeyPopup();
+      const val = btn.dataset.value;
+      const binds = vBindings[val] ? vBindings[val].slice() : [];
+      const popup = document.createElement('div');
+      popup.className = 'key-popup';
+      popup.innerHTML = '<div class="kp-row"><div style="font-weight:600">Клавиша</div><div class="kp-unbind" role="button">Отвязать</div></div>'
+        + '<div class="kp-bindings">' + (binds.length ? binds.join(', ') : '<span style="opacity:.6">Нет привязок</span>') + '</div>';
+      document.body.appendChild(popup);
+      currentPopup = popup;
+
+      const rect = btn.getBoundingClientRect();
+      popup.style.top = '0px';
+      popup.style.left = '0px';
+      const popupRect = popup.getBoundingClientRect();
+      let top = rect.top - popupRect.height - 8;
+      let left = rect.left + (rect.width/2) - (popupRect.width/2);
+      if (top < 8) top = rect.bottom + 8;
+      if (left < 8) left = 8;
+      if (left + popupRect.width > window.innerWidth - 8) left = window.innerWidth - popupRect.width - 8;
+      popup.style.top = (top + window.scrollY) + 'px';
+      popup.style.left = (left + window.scrollX) + 'px';
+
+      popup.querySelector('.kp-unbind').addEventListener('click', function(e){
+        try{ e.stopPropagation(); unbindKey(val); hideKeyPopup(); }catch(ex){}
+      });
+
+      setTimeout(()=>{ document.addEventListener('pointerdown', onDocPointerDownForPopup); }, 10);
+    }catch(e){ console.error(e); }
+  }
+
+  function hideKeyPopup(){
+    try{ if(currentPopup){ currentPopup.remove(); currentPopup=null; document.removeEventListener('pointerdown', onDocPointerDownForPopup); } }catch(e){}
+  }
+  function onDocPointerDownForPopup(e){ try{ if(!currentPopup) return; if(!currentPopup.contains(e.target)) hideKeyPopup(); }catch(e){} }
+
+  function unbindKey(val){
+    try{
+      const toRemove=[];
+      Object.keys(bindings).forEach(k=>{ if(bindings[k]===val) toRemove.push(k); });
+      toRemove.forEach(k=>{ delete bindings[k]; });
+      if (vBindings[val]) delete vBindings[val];
+      saveAll();
+      updateBindingsUI();
+    }catch(e){ console.error('unbind error', e); }
+  }
+
+  const __rejectTimers = new WeakMap();
+
+  function showRejectAnim(btn, durationMs = 700){
+    try{
+      if(!btn || !(btn instanceof Element)) return;
+      const existing = btn.querySelector('.reject-overlay');
+      if (existing) existing.remove();
+      const overlay = document.createElement('span');
+      overlay.className = 'reject-overlay';
+      try{ const cs = getComputedStyle(btn); if(cs && cs.borderRadius) overlay.style.borderRadius = cs.borderRadius; }catch(e){}
+      btn.appendChild(overlay);
+      const cleanup = ()=>{ try{ overlay.remove(); }catch(e){} };
+      overlay.addEventListener('animationend', cleanup, { once: true });
+      setTimeout(cleanup, durationMs + 120);
+    }catch(err){ console.error('showRejectAnim error', err); }
+  }
+
+  function showAcceptAnim(btn, durationMs = 700){
+    try{
+      if(!btn || !(btn instanceof Element)) return;
+      const existing = btn.querySelector('.accept-overlay');
+      if (existing) existing.remove();
+      const overlay = document.createElement('span');
+      overlay.className = 'accept-overlay';
+      overlay.style.position = 'absolute';
+      overlay.style.left = '0';
+      overlay.style.top = '0';
+      overlay.style.width = '100%';
+      overlay.style.height = '100%';
+      overlay.style.transformOrigin = 'center center';
+      overlay.style.transform = 'scale(0.18)';
+      overlay.style.pointerEvents = 'none';
+      overlay.style.zIndex = 4;
+      overlay.style.willChange = 'transform, opacity';
+      overlay.style.background = 'rgba(20,160,80,1)';
+      overlay.style.animation = 'rejectFull 620ms cubic-bezier(.2,.8,.2,1) forwards';
+      try{ const cs = getComputedStyle(btn); if(cs && cs.borderRadius) overlay.style.borderRadius = cs.borderRadius; }catch(e){}
+      btn.appendChild(overlay);
+      const cleanup = ()=>{ try{ overlay.remove(); }catch(e){} };
+      overlay.addEventListener('animationend', cleanup, { once:true });
+      setTimeout(cleanup, durationMs + 120);
+    }catch(err){ console.error('showAcceptAnim error', err); }
+  }
+
+  function showRejectOverlay(btn, delayMs = 1000){
+    try{
+      if(!btn || !(btn instanceof Element)) return;
+      cancelRejectOverlay(btn);
+      const t = setTimeout(()=>{
+        try{ showRejectAnim(btn); } finally { __rejectTimers.delete(btn); }
+      }, delayMs);
+      __rejectTimers.set(btn, t);
+    }catch(err){ console.error('showRejectOverlay error', err); }
+  }
+
+  function cancelRejectOverlay(btn){
+    try{
+      if(!btn) return;
+      const t = __rejectTimers.get(btn);
+      if (t){ clearTimeout(t); __rejectTimers.delete(btn); }
+    }catch(err){ console.error('cancelRejectOverlay error', err); }
+  }
+
+  function renderBlock(blockIndex, rowsDef, cols){
+    try{
+      const container = rowsContainers[blockIndex];
+      if(!container) return;
+      while(container.firstChild) container.removeChild(container.firstChild);
+      const rows = buildRows(rowsDef, cols);
+      rows.forEach((rowArr,rowIndex)=>{
+        try{
+          const rowEl = document.createElement('div');
+          rowEl.className = 'row';
+          rowEl.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+          if(!Array.isArray(rowArr) || rowArr.length===0){
+            const emptyBtn = document.createElement('div');
+            emptyBtn.className = 'key empty';
+            rowEl.appendChild(emptyBtn);
+          } else {
+            rowArr.forEach(val=>{
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'key';
+              const mainText = displayTextForKey(val);
+              btn.innerHTML = '<span class="key-main" aria-hidden="true">' + (mainText || '') + '</span><span class="binding-badge"></span>';
+              btn.dataset.value = val;
+              
+              try {
+                const mainSpan = btn.querySelector('.key-main');
+                if (mainSpan && containsDevanagari(val)) {
+                mainSpan.style.setProperty('font-family', "'SanskritFont', 'Andika', sans-serif", 'important');
+              } else if (mainSpan) {
+                mainSpan.style.removeProperty('font-family');
+              }
+              } catch (e) { console.error('apply font to key error', e); }
+
+              let longTimer = null;
+              const LONG_MS = 700;
+
+              btn.addEventListener('pointerdown', function(ev){
+                try{
+                  if(ev.button === 2){
+                    longTimer = setTimeout(()=>{
+                      unbindKey(btn.dataset.value);
+                      hideKeyPopup();
+                      try{ btn.animate([{ transform:'scale(1.02)' }, { transform:'scale(1)' }], { duration:160 }); }catch(e){}
+                    }, LONG_MS);
+                    ev.preventDefault();
+                    return;
+                  }
+                  ev.preventDefault();
+                  if(bindMode){
+                    if(hoveredKey && hoveredKey !== btn) hoveredKey.classList.remove('bind-hover');
+                    hoveredKey = btn;
+                    hoveredKeyBlock = blockIndex;
+                    btn.classList.add('bind-hover');
+                    return;
+                  }
+                  insertAtCursor(val);
+                }catch(e){ console.error('pointerdown handler failed', e); }
+              }, { passive:false });
+
+              const clearLong = ()=>{ if(longTimer){ clearTimeout(longTimer); longTimer = null; } };
+              btn.addEventListener('pointerup', clearLong);
+              btn.addEventListener('pointercancel', clearLong);
+              btn.addEventListener('pointerleave', clearLong);
+
+              btn.addEventListener('pointerenter', function(){
+                try{
+                  if(!bindMode) return;
+                  if(hoveredKey && hoveredKey !== btn) hoveredKey.classList.remove('bind-hover');
+                  hoveredKey = btn;
+                  hoveredKeyBlock = blockIndex;
+                  btn.classList.add('bind-hover');
+                }catch(e){}
+              }, { passive:true });
+
+              btn.addEventListener('pointerleave', function(){
+                try{
+                  if(!bindMode) return;
+                  if(hoveredKey===btn){ btn.classList.remove('bind-hover'); hoveredKey=null; hoveredKeyBlock=null; }
+                }catch(e){}
+              }, { passive:true });
+
+              btn.addEventListener('contextmenu', function(ev){
+                try{ ev.preventDefault(); showKeyPopup(btn, ev); }catch(e){}
+              });
+
+              rowEl.appendChild(btn);
+            });
+          }
+          container.appendChild(rowEl);
+        }catch(eRow){ console.error('Ошибка рендера строки', blockIndex, rowIndex, eRow); }
+      });
+      updateBindingsUI();
+    }catch(e){ console.error('renderBlock error', e); }
+  }
+
+
+  let blocksDefs = KEYS_BLOCKS_SET1;
+
+function updateMainTextFontByContent() {
+  try {
+    if (!mainText) return;
+    if (containsDevanagari(mainText.value)) {
+      mainText.style.setProperty('font-family', "'SanskritFont', 'Andika', sans-serif", 'important');
+    } else {
+      mainText.style.removeProperty('font-family');
+    }
+  } catch (e) {}
+}
+
+
+mainText && mainText.addEventListener('input', updateMainTextFontByContent, { passive: true });
+updateMainTextFontByContent();
+
+  function renderAll(){
+    try{
+      for(let i=0;i<3;i++){
+        const def = blocksDefs[i] || [];
+        renderBlock(i, def, maxColsArr[i]||6);
+      }
+    }catch(e){ console.error('renderAll error', e); }
+  }
+
+  window.safeRender = function(){ try{ renderAll(); }catch(e){ console.error('safeRender error', e); } };
+
+  function insertAtCursor(textRaw){
+    try{
+      const text = applyCaps(textRaw);
+      const ta = mainText;
+      const prohibit = !!(allowPhysical && allowPhysical.checked);
+      if(!ta) return;
+      if(prohibit) ta.readOnly = false;
+      const start = (typeof ta.selectionStart === 'number') ? ta.selectionStart : ta.value.length;
+      const end = (typeof ta.selectionEnd === 'number') ? ta.selectionEnd : start;
+      ta.value = ta.value.substring(0,start) + text + ta.value.substring(end);
+      const newPos = start + text.length;
+      try{ ta.setSelectionRange(newPos,newPos); }catch(e){}
+      if(prohibit) ta.readOnly = true;
+      if(capsState === 1){ capsState = 0; capsOn = false; updateCapsUI(); saveAll(); }
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+      ta.dispatchEvent(new Event('change', { bubbles: true }));
+    }catch(e){ console.error('insertAtCursor error', e); }
+  }
+
+  function updateCapsUI(){
+    try{
+      if(!capsBtn) return;
+      capsBtn.classList.remove('caps-dim','caps-green');
+      if(capsState === 1) capsBtn.classList.add('caps-dim');
+      if(capsState === 2) capsBtn.classList.add('caps-green');
+      capsOn = (capsState !== 0);
+
+      for(let i=0;i<rowsContainers.length;i++){
+        const container = rowsContainers[i];
+        if(!container) continue;
+        const keyButtons = container.querySelectorAll('.key');
+        Array.from(keyButtons).forEach(btn=>{
+          try{
+            const val = btn.dataset ? btn.dataset.value : null;
+            const main = btn.querySelector('.key-main');
+            if(main) main.textContent = displayTextForKey(val);
+          }catch(e){}
+        });
+      }
+      updateBindingsUI();
+    }catch(e){ console.error('updateCapsUI error', e); }
+  }
+
+  function applyKeyboardProhibitMode(){
+    try{
+      const prohibit = !!(allowPhysical && allowPhysical.checked);
+      if(!mainText) return;
+      if(prohibit){
+        mainText.setAttribute('inputmode','none');
+        mainText.readOnly = true;
+        const blurOnFocus = (e)=>{ e.preventDefault(); mainText.blur(); };
+        mainText.__blurOnFocus = blurOnFocus;
+        mainText.addEventListener('focus', blurOnFocus, { passive:false });
+        mainText.blur();
+      } else {
+        mainText.removeAttribute('inputmode');
+        mainText.readOnly = false;
+        if(mainText.__blurOnFocus){ mainText.removeEventListener('focus', mainText.__blurOnFocus); delete mainText.__blurOnFocus; }
+      }
+      saveAll();
+    }catch(e){ console.error('applyKeyboardProhibitMode error', e); }
+  }
+
+  try{ if(allowPhysical) allowPhysical.addEventListener('change', function(){ try{ applyKeyboardProhibitMode(); }catch(e){} }); }catch(e){}
+
+  try {
+    if (copyBtn) {
+      copyBtn.addEventListener('click', async function (e) {
+        e.preventDefault();
+        const prevHtml = copyBtn.innerHTML;
+        try {
+          if (!mainText) return;
+          const textToCopy = String(mainText.value || '');
+
+          if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            try {
+              await navigator.clipboard.writeText(textToCopy);
+              
+              return;
+            } catch (err) {
+              console.warn('navigator.clipboard failed, falling back', err);
+            }
+          }
+
+          const tmp = document.createElement('textarea');
+          tmp.value = textToCopy;
+          tmp.setAttribute('readonly','');
+          tmp.style.position = 'absolute';
+          tmp.style.left = '-9999px';
+          tmp.style.top = '0';
+          tmp.style.width = '1px';
+          tmp.style.height = '1px';
+          tmp.style.opacity = '0';
+          document.body.appendChild(tmp);
+          tmp.select();
+          tmp.setSelectionRange(0, tmp.value.length);
+          let ok = false;
+          try { ok = document.execCommand('copy'); } catch (ex) { console.warn('execCommand copy failed', ex); }
+          tmp.remove();
+
+          if (!ok) {
+            try { mainText.focus(); mainText.select(); } catch(_) {}
+            console.error('Автокопирование не удалось. Попробуйте вручную Ctrl/C.');
+            copyBtn.innerHTML = prevHtml;
+            return;
+          }
+
+
+
+        } catch (err) {
+          console.error('Copy handler error', err);
+          try { copyBtn.innerHTML = '✖'; setTimeout(()=>{ copyBtn.innerHTML = prevHtml; },900); } catch(_) {}
+          try { mainText.focus(); mainText.select(); } catch(_) {}
+        }
+      }, { passive: false });
+    }
+  } catch (e) {
+    console.error('Error attaching copy handler', e);
+  }
+
+
+
+try {
+  if (backspaceBtn && mainText) {
+    let repeatStartTimer = null;
+    let repeatInterval = null;
+
+    const clearRepeat = () => {
+      if (repeatStartTimer) { clearTimeout(repeatStartTimer); repeatStartTimer = null; }
+      if (repeatInterval) { clearInterval(repeatInterval); repeatInterval = null; }
+    };
+
+    const deleteOnce = () => {
+      try {
+        const ta = mainText;
+        if (!ta) return;
+        const prohibit = !!(allowPhysical && allowPhysical.checked);
+
+        if (prohibit) ta.readOnly = false;
+
+        const start = (typeof ta.selectionStart === 'number') ? ta.selectionStart : ta.value.length;
+        const end = (typeof ta.selectionEnd === 'number') ? ta.selectionEnd : start;
+
+        if (start === end) {
+          if (start > 0) {
+            const newPos = start - 1;
+            ta.value = ta.value.slice(0, newPos) + ta.value.slice(end);
+            try { ta.setSelectionRange(newPos, newPos); } catch (e) {}
+          }
+        } else {
+          ta.value = ta.value.slice(0, start) + ta.value.slice(end);
+          try { ta.setSelectionRange(start, start); } catch (e) {}
+        }
+
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+        ta.dispatchEvent(new Event('change', { bubbles: true }));
+
+        if (prohibit) ta.readOnly = true;
+      } catch (err) {
+        console.error('deleteOnce error', err);
+      }
+    };
+
+    backspaceBtn.addEventListener('pointerdown', function (ev) {
+      try {
+        if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+        ev.preventDefault();
+
+        deleteOnce();
+
+        clearRepeat();
+        repeatStartTimer = setTimeout(() => {
+          repeatInterval = setInterval(deleteOnce, 90);
+        }, 300);
+
+      } catch (err) {
+        console.error('backspace pointerdown error', err);
+      }
+    }, { passive: false });
+
+    ['pointerup', 'pointercancel', 'pointerleave', 'pointerout'].forEach(evtName => {
+      backspaceBtn.addEventListener(evtName, () => { clearRepeat(); }, { passive: true });
+    });
+
+    document.addEventListener('pointerup', () => { clearRepeat(); }, { passive: true });
+  }
+} catch (e) {
+  console.error('backspace init error', e);
+}
+
+
+
+  try{
+    if(spaceBtn) spaceBtn.addEventListener('click', function(){ try{ insertAtCursor(' '); }catch(e){} }, { passive:true });
+  }catch(e){}
+
+  try{
+    if(capsBtn){
+      capsBtn.addEventListener('click', function(e){
+        try{
+          if(capsState === 2) capsState = 0;
+          else if(capsState === 0) capsState = 1;
+          else if(capsState === 1) capsState = 0;
+          updateCapsUI(); saveAll();
+        }catch(e){ console.error('caps click error', e); }
+      }, { passive:true });
+
+      capsBtn.addEventListener('dblclick', function(e){
+        try{ capsState = 2; updateCapsUI(); saveAll(); }catch(e){}
+      }, { passive:true });
+    }
+  }catch(e){}
+
+  try{
+    if(bindModeBtn){
+      bindModeBtn.addEventListener('click', function(){
+        bindMode = !bindMode;
+        bindModeBtn.classList.toggle('toggle-active', bindMode);
+        if(!bindMode && hoveredKey){ cancelRejectOverlay(hoveredKey); hoveredKey.classList.remove('bind-hover'); hoveredKey=null; hoveredKeyBlock=null; }
+      }, { passive:true });
+    }
+  }catch(e){}
+
+  document.addEventListener('keydown', function(e){
+    try{
+      if(bindMode && hoveredKey){
+        const val = hoveredKey.dataset.value;
+        const phys = normalizePhysKey(e);
+
+        const onlyModifierKeys = ['Shift','Alt','Control','Meta','Tab'];
+        const onlyModifierCodes = ['ShiftLeft','ShiftRight','AltLeft','AltRight','ControlLeft','ControlRight','MetaLeft','MetaRight','Tab'];
+        const isOnlyModifier = onlyModifierCodes.includes(e.code) || onlyModifierKeys.includes(e.key);
+
+        let combo = '';
+        if (e.ctrlKey && !phys.startsWith('Control') && !phys.startsWith('Ctrl')) combo += 'Ctrl+';
+        if (e.shiftKey && !phys.startsWith('Shift')) combo += 'Shift+';
+        if (e.altKey && !phys.startsWith('Alt')) combo += 'Alt+';
+        if (e.metaKey && !phys.startsWith('Meta')) combo += 'Meta+';
+        if (e.code === 'Tab' && !combo.includes('Tab+')) combo += 'Tab+';
+        combo += phys;
+
+        let reject = false;
+
+        if(isOnlyModifier){
+          reject = true;
+        } else if(bindings[combo] && bindings[combo] !== val){
+          reject = true;
+        } else if(vBindings[val] && vBindings[val].length>0 && !vBindings[val].includes(combo)){
+          reject = true;
+        }
+
+        if(reject){
+          showRejectOverlay(hoveredKey, 1000);
+        } else {
+          cancelRejectOverlay(hoveredKey);
+          if(vBindings[val]) vBindings[val].forEach(old=>{ if(bindings[old]) delete bindings[old]; });
+          bindings[combo] = val;
+          vBindings[val] = [combo];
+          updateBindingsUI();
+          saveAll();
+          try{ showAcceptAnim(hoveredKey); }catch(e){}
+          try{ const prev = bindModeBtn.innerHTML; bindModeBtn.textContent = '✓'; setTimeout(()=>{ bindModeBtn.innerHTML = prev; },700); }catch(e){}
+        }
+
+        if(!reject){
+          hoveredKey.classList.add('bind-success');
+          setTimeout(()=>hoveredKey.classList.remove('bind-success'), 350);
+        }
+
+        e.preventDefault(); e.stopPropagation();
+        return;
+      }
+
+      if(allowPhysical && allowPhysical.checked){
+        const phys = normalizePhysKey(e);
+        if(bindings[phys]){
+          insertAtCursor(bindings[phys]);
+          e.preventDefault(); e.stopPropagation();
+          return false;
+        }
+      }
+    }catch(err){
+      console.error('keydown handler error', err);
+    }
+  }, true);
+
+  const toggleThreeBtn = document.getElementById('toggleThreeBtn');
+  if (toggleThreeBtn) {
+    toggleThreeBtn.addEventListener('click', () => {
+      usingAltSet = !usingAltSet;
+      blocksDefs = usingAltSet ? KEYS_BLOCKS_SET2 : KEYS_BLOCKS_SET1;
+      renderAll();
+      document.body.classList.toggle('sanskrit-on', usingAltSet);
+
+      toggleThreeBtn.classList.toggle('toggle-active', usingAltSet);
+      toggleThreeBtn.setAttribute('aria-pressed', usingAltSet ? 'true' : 'false');
+    }, { passive: true });
+  }
+
+
+  loadAll();
+  applyKeyboardProhibitMode();
+  renderAll();
+
+})();
+</script>
+
+<style>
+  #snowCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 9999;
+
+    -webkit-mask-image: linear-gradient(#000 0 0);
+    mask-image: linear-gradient(#000 0 0);
+  }
+</style>
+
+<script>
+(function() {
+
+    const canvas = document.createElement("canvas");
+    canvas.id = "snowCanvas";
+    document.body.appendChild(canvas);
+
+    const ctx = canvas.getContext("2d");
+    const DPR = window.devicePixelRatio || 1;
+
+    let flakes = [];
+
+    function targetFlakes() {
+      const base = Math.floor((canvas.width * canvas.height) / 6000);
+
+      const isMobileOrTablet =
+        window.matchMedia('(pointer: coarse)').matches ||
+        (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+
+      return isMobileOrTablet ? Math.floor(base / 5) : base;
+    }
+
+    function resizeCanvas() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+
+        canvas.style.width = w + "px";
+        canvas.style.height = h + "px";
+
+        canvas.width = w * DPR;
+        canvas.height = h * DPR;
+
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+        const need = targetFlakes();
+        flakes = [];
+        for (let i = 0; i < need; i++) {
+            flakes.push(makeFlake(w, h));
+        }
+    }
+
+    function makeFlake(w, h) {
+        return {
+            x: Math.random() * w,
+            y: Math.random() * h,
+
+            r: 1.5 + Math.random() * 3.5,   
+            vy: 0.6 + Math.random() * 1.4,  
+
+            vx: -0.2 + Math.random() * 0.4, 
+
+            sway: 0.4 + Math.random() * 1.0,
+
+            phase: Math.random() * Math.PI * 2,
+
+            alpha: 0.6 + Math.random() * 0.4
+        };
+    }
+
+    function flakeColor(alpha) {
+        const dark = document.body.classList.contains("dark");
+        return dark
+            ? `rgba(255,255,255,${alpha})`
+            : `rgba(160,210,255,${alpha})`; 
+    }
+
+    function loop() {
+        const w = canvas.width / DPR;
+        const h = canvas.height / DPR;
+
+        ctx.clearRect(0, 0, w, h);
+
+        for (let flake of flakes) {
+
+            flake.phase += 0.003 + Math.random() * 0.003;
+
+            const sway = Math.sin(flake.phase) * flake.sway * 0.3;
+
+            const drift = (Math.random() - 0.5) * 0.08;
+
+            flake.x += flake.vx + sway + drift;
+            flake.y += flake.vy;
+
+            if (flake.y > h + 5 || flake.x < -10 || flake.x > w + 10) {
+                Object.assign(flake, makeFlake(w, h), { y: -10 });
+            }
+
+            ctx.beginPath();
+            ctx.fillStyle = flakeColor(flake.alpha);
+            ctx.arc(flake.x, flake.y, flake.r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        requestAnimationFrame(loop);
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+
+    resizeCanvas();
+    loop();
+
+})();
+</script>
+
+
+
+<script>
+(function () {
+
+  const LS_KEY = 'webkbd_saves_v1';
+  const LIMIT = 20;
+
+  const textarea  = document.getElementById('mainText');
+  const saveBtn   = document.getElementById('saveBtn');
+  const modal     = document.getElementById('saveModal');
+  const saveList  = document.getElementById('saveList');
+  const createBtn = document.getElementById('createSave');
+  const nameInput = document.getElementById('saveName');
+  const closeBtn  = document.getElementById('closeSave');
+
+  if (!textarea || !saveBtn || !modal) return;
+
+  function readSaves() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
+    catch { return []; }
+  }
+
+  function writeSaves(arr) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
+    catch {}
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c =>
+      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])
+    );
+  }
+
+  function renderList() {
+    const arr = readSaves();
+    saveList.innerHTML = '';
+
+    arr.forEach((it, i) => {
+      const row = document.createElement('div');
+      row.className = 'saveItem';
+
+      row.innerHTML = `
+        <div>
+          <strong>${escapeHtml(it.name)}</strong>
+          <div class="saveMeta">${new Date(it.date).toLocaleString()}</div>
+        </div>
+        <div class="saveActions">
+          <button class="openSave" data-i="${i}">📂</button>
+          <button class="deleteSave" data-i="${i}">❌</button>
+        </div>
+      `;
+
+      saveList.appendChild(row);
+    });
+  }
+
+  saveBtn.addEventListener('click', () => {
+    renderList();
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+    setTimeout(() => nameInput?.focus(), 60);
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeBtn.click();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.style.display === 'flex') {
+      closeBtn.click();
+    }
+  });
+
+  saveList.addEventListener('click', (e) => {
+    const i = e.target.dataset.i;
+    if (i == null) return;
+
+    const arr = readSaves();
+
+    if (e.target.classList.contains('openSave')) {
+      textarea.value = arr[i].text;
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      closeBtn.click();
+    }
+
+    if (e.target.classList.contains('deleteSave')) {
+      arr.splice(i, 1);
+      writeSaves(arr);
+      renderList();
+    }
+  });
+
+  createBtn.addEventListener('click', () => {
+    const name = nameInput.value.trim();
+    if (!name) return alert('Enter a name');
+
+    let arr = readSaves();
+    if (arr.length >= LIMIT) arr.shift();
+
+    arr.push({
+      name: name.slice(0,60),
+      text: textarea.value,
+      date: Date.now()
+    });
+
+    writeSaves(arr);
+    nameInput.value = '';
+    renderList();
+  });
+
+})();
+</script>
+
+
+<div id="mobileOverlay" hidden>
+  <div class="mobileBox">
+    <button class="mobileClose" aria-label="Close">
+  <img src="icons/close.svg" alt="">
+</button>
+
+
+<div class="mobileIcon">
+  <img src="icons/infoIcon.svg" alt="">
+</div>
+
+
+
+    <button id="goMobile" class="mobileBtn">
+      Перейти на версию для смартфонов
+    </button>
+
+    <label class="mobileRemember">
+      <input type="checkbox" id="rememberChoice">
+      Запомнить выбор
+    </label>
+  </div>
+</div>
+
+
+<script>
+(function () {
+  const KEY = 'pc_mobile_warning_hidden';
+
+  if (localStorage.getItem(KEY) === '1') return;
+
+
+const isTouch =
+  window.matchMedia('(pointer: coarse)').matches ||
+  navigator.maxTouchPoints > 0;
+
+
+
+
+  if (!isTouch) return;
+
+  const overlay = document.getElementById('mobileOverlay');
+  const closeBtn = overlay.querySelector('.mobileClose');
+  const goBtn = document.getElementById('goMobile');
+  const remember = document.getElementById('rememberChoice');
+
+  overlay.hidden = false;
+
+  function hide() {
+    overlay.hidden = true;
+    if (remember.checked) {
+      localStorage.setItem(KEY, '1');
+    }
+  }
+
+  closeBtn.addEventListener('click', hide);
+
+  goBtn.addEventListener('click', () => {
+    if (remember.checked) {
+      localStorage.setItem(KEY, '1');
+    }
+    window.location.href = './mobile.html';
+  });
+})();
+</script>
+
+<script>
+(function(){
+  const btn = document.getElementById('snowBtn');
+  const canvas = document.getElementById('snowCanvas');
+  if (!btn || !canvas) return;
+
+  const LS = 'webkbd_snow_on_v1';
+
+  let snowOn;
+  try {
+    snowOn = JSON.parse(localStorage.getItem(LS));
+  } catch {
+    snowOn = null;
+  }
+  if (snowOn === null) snowOn = true; 
+
+  function applyUI(){
+    canvas.style.display = snowOn ? 'block' : 'none';
+    btn.classList.toggle('toggle-active', snowOn);
+    btn.setAttribute('aria-pressed', snowOn ? 'true' : 'false');
+  }
+
+  applyUI();
+
+  btn.addEventListener('click', () => {
+    snowOn = !snowOn;
+    try {
+      localStorage.setItem(LS, JSON.stringify(snowOn));
+    } catch {}
+    applyUI();
+  });
+})();
+</script>
+
+
+
+<div id="downloadModal" aria-hidden="true">
+  <div class="downloadBox" role="dialog" aria-modal="true" aria-label="Скачать экранную клавиатуру">
+<button class="downloadClose" aria-label="Закрыть" type="button">
+  <img src="icons/close.svg" alt="" class="closeIcon">
+</button>
+    <h3 style="margin:8px 0 4px 0;">Скачайте экранную клавиатуру</h3>
+    <p style="margin:0 0 12px 0;">скачайте архив, затем распакуйте его</p>
+
+<a href="download/Sanskrit_Keyboard.zip" download class="downloadBtn">
+  <img src="icons/icondowload.svg" alt="" class="btnIcon">
+  <span>Скачать архив</span>
+</a>
+
+
+    <label class="dontShow" style="display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer;">
+      <input type="checkbox" id="dontShowAgain" />
+      <span>Больше не показывать</span>
+    </label>
+  </div>
+</div>
+
+
+
+<script>
+(function(){
+  const LS_KEY = 'download_modal_hidden_v1'; 
+
+  const modal = document.getElementById('downloadModal');
+  const closeBtn = modal?.querySelector('.downloadClose');
+  const dont = document.getElementById('dontShowAgain');
+  const downloadLink = document.getElementById('downloadLink');
+
+  function showModal() {
+    if (!modal) return;
+    modal.style.display = 'flex';
+    setTimeout(()=> modal.classList.add('show'), 10);
+    modal.setAttribute('aria-hidden','false');
+  }
+  function hideModal() {
+    if (!modal) return;
+    modal.classList.remove('show');
+    setTimeout(()=> { modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); }, 220);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    try {
+      const hidden = localStorage.getItem(LS_KEY);
+      if (hidden !== '1') {
+
+        showModal();
+      }
+    } catch(e) { showModal(); }
+  });
+
+
+  closeBtn?.addEventListener('click', () => {
+    if (dont && dont.checked) {
+      try { localStorage.setItem(LS_KEY, '1'); } catch(e){}
+    }
+    hideModal();
+  });
+
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      if (dont && dont.checked) {
+        try { localStorage.setItem(LS_KEY, '1'); } catch(e){}
+      }
+      hideModal();
+    }
+  });
+
+  downloadLink?.addEventListener('click', () => {
+    if (dont && dont.checked) {
+      try { localStorage.setItem(LS_KEY, '1'); } catch(e){}
+    }
+    hideModal();
+
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && modal.style.display === 'flex') {
+      if (dont && dont.checked) {
+        try { localStorage.setItem(LS_KEY, '1'); } catch(e){}
+      }
+      hideModal();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
